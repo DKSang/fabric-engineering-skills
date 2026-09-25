@@ -11,3 +11,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check skill invariants
         run: scripts/check-skills.sh
+      - name: Test workspace_state.py
+        run: python3 -m unittest discover -s tests -v

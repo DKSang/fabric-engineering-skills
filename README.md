@@ -112,6 +112,11 @@ The agent acts as whoever signs in to `fab`. Written guardrails keep it honest, 
 
 ### Brain
 
+**User-invoked**
+
+- **[document-fabric-workspace](./skills/brain/document-fabric-workspace/SKILL.md)**: Inventory a workspace into `reference/workspaces/<ws>.md`: items, tables and schemas, what each notebook and pipeline does, and the lineage between them. Incremental: a state file with fingerprints (item IDs, repo definition hashes, table timestamps) means a re-run reads only what's new, changed or stale. Read-only against Fabric.
+- **[fabric-retro](./skills/brain/fabric-retro/SKILL.md)**: Run before closing a session. Finds corrections, lessons, uncaptured facts and stale lines the brain should know about, proposes each one with its evidence, and applies only what you pick.
+
 **Model-invoked**
 
 - **[fabric-brain](./skills/brain/fabric-brain/SKILL.md)**: Read the relevant `reference/` files before Fabric work, and record every durable fact you explain or correct (conventions, environment facts, gotchas, business terms) in the right file, in the same turn. Owns the layout and formats of `reference/`.
@@ -131,9 +136,7 @@ Planned next, building on the brain the setup creates:
 | Skill | Job |
 | --- | --- |
 | `fabric-item-definitions` | Read and safely modify Git-connected item definitions (notebooks, pipelines, lakehouses) |
-| `document-fabric-workspace` | Inventory a workspace into `reference/workspaces/<name>.md` |
 | `fabric-guardrails` | A hook that blocks `fab` writes outside the allowed workspaces |
-| `fabric-retro` | End-of-session sweep: what did we learn that the brain should keep? |
 
 ## Related
 

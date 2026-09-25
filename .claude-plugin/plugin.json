@@ -18,6 +18,8 @@
   "skills": [
     "./skills/setup/setup-fabric-engineering-skills",
     "./skills/brain/fabric-brain",
+    "./skills/brain/document-fabric-workspace",
+    "./skills/brain/fabric-retro",
     "./skills/build/build-in-fabric"
   ]
 }

@@ -78,9 +78,11 @@ Agent hành động dưới danh nghĩa identity đăng nhập vào `fab`. Guard
 
 - **[setup-fabric-engineering-skills](./skills/setup/setup-fabric-engineering-skills/SKILL.md)** (người dùng gọi): biến repo thành Fabric brain, cài CLI và MCP, hướng dẫn đăng nhập, rồi xác minh mọi kết nối.
 - **[fabric-brain](./skills/brain/fabric-brain/SKILL.md)** (agent tự gọi): đọc các file `reference/` liên quan trước khi làm việc Fabric, và ghi lại mọi điều lâu dài bạn giải thích hoặc sửa (convention, môi trường, lỗi đã gặp, thuật ngữ nghiệp vụ) vào đúng file, ngay trong lượt đó. Sở hữu bố cục và định dạng của `reference/`.
+- **[document-fabric-workspace](./skills/brain/document-fabric-workspace/SKILL.md)** (người dùng gọi): lập danh mục workspace vào `reference/workspaces/<ws>.md` (item, bảng và schema, notebook và pipeline làm gì, lineage). Quét tăng dần: file state lưu fingerprint (ID item, hash definition trong repo, thời điểm sửa bảng) nên lần chạy sau chỉ đọc cái mới, đã đổi hoặc đã cũ. Chỉ đọc, không ghi vào Fabric.
+- **[fabric-retro](./skills/brain/fabric-retro/SKILL.md)** (người dùng gọi): chạy trước khi đóng phiên. Tìm lời sửa sai, bài học, sự thật chưa lưu và dòng đã cũ trong `reference/`, đề xuất từng thay đổi kèm bằng chứng, chỉ áp dụng cái bạn chọn.
 - **[build-in-fabric](./skills/build/build-in-fabric/SKILL.md)** (agent tự gọi): biến yêu cầu như "dựng bronze layer cho dữ liệu orders trong workspace dev" thành item chạy được: đọc convention, tra định dạng mới nhất trên Fabric MCP và Microsoft Learn, trình kế hoạch dry-run chờ bạn đồng ý, chỉ build trong workspace được phép (trực tiếp bằng `fab`, hoặc ghi definition vào repo đã kết nối Git), xác minh, rồi chạy test end-to-end kiểm tra dữ liệu và tự sửa lỗi.
 
-Các skill tiếp theo (`fabric-item-definitions`, `document-fabric-workspace`, `fabric-guardrails`, `fabric-retro`) nằm trong [roadmap](./README.md#roadmap).
+Các skill tiếp theo (`fabric-item-definitions`, `fabric-guardrails`) nằm trong [roadmap](./README.md#roadmap).
 
 ## Liên quan
 

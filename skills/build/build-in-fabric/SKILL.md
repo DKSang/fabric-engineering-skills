@@ -130,4 +130,4 @@ Tell the user what was built, in this shape:
 **Verified on Learn**: <urls>
 ```
 
-Then call the Skill tool with "fabric-brain" to capture what this build taught you: the cause of any failure that wasn't obvious (`lessons.md`), new key items (`environment.md`), and any convention the user clarified along the way. Leave all repo changes uncommitted for the user to review.
+Then call the Skill tool with "fabric-brain" to capture what this build taught you: the cause of any failure that wasn't obvious (`lessons.md`), new key items (`environment.md`), and any convention the user clarified along the way. Leave all repo changes uncommitted for the user to review, and suggest running `/document-fabric-workspace <workspace>` so the workspace inventory picks up the new items (it only reads what changed).

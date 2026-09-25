@@ -172,4 +172,5 @@ Tell the user:
 - what was written (a short file list) and what was verified
 - how to start: open a new session and ask for a Fabric task without restating their conventions; the agent reads `AGENTS.md` first
 - that `reference/` is theirs to grow: whenever they explain or correct something durable, the agent records it there in the same turn (the `fabric-brain` skill), so the brain gets smarter every session. They review those changes in the Git diff like any other change
+- two commands worth knowing: `/document-fabric-workspace <workspace>` to inventory a workspace into the brain (incremental after the first run), and `/fabric-retro` before closing a session to catch what slipped through
 - that re-running this skill is only needed to change tools, scope or MCP servers; `/setup-fabric-engineering-skills verify` re-checks the connections any time

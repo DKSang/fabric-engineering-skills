@@ -1,0 +1,5 @@
+interface:
+  display_name: "Document Fabric Workspace"
+  short_description: "Incrementally inventory a workspace into reference/"
+policy:
+  allow_implicit_invocation: false
