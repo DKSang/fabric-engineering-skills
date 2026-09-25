@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Checks the repo invariants from CLAUDE.md:
+# Checks the repo invariants from .claude/CLAUDE.md:
 #   - frontmatter `name` equals the folder name
 #   - every skill has agents/openai.yaml, and invocation mode agrees with SKILL.md
 #   - every shipped skill is in plugin.json, README.md, README.vi.md and its bucket README
@@ -56,6 +56,13 @@ done < <(find skills -name SKILL.md | sort)
 while IFS= read -r path; do
   [ -f "$path/SKILL.md" ] || err "plugin.json: $path has no SKILL.md"
 done < <(grep -oE '"\./skills/[^"]+"' .claude-plugin/plugin.json | tr -d '"')
+
+# The plugin version has a CHANGELOG entry, and the marketplace entry agrees on the name.
+version="$(sed -n 's/^  "version": "\(.*\)",$/\1/p' .claude-plugin/plugin.json)"
+[ -n "$version" ] || err "plugin.json: no version"
+grep -q "^## $version\$" CHANGELOG.md || err "CHANGELOG.md: no '## $version' section for plugin.json version"
+plugin_name="$(sed -n 's/^  "name": "\(.*\)",$/\1/p' .claude-plugin/plugin.json)"
+grep -q "\"name\": \"$plugin_name\"" .claude-plugin/marketplace.json || err "marketplace.json: no plugin named '$plugin_name'"
 
 [ "$fail" -eq 0 ] && echo "ok: all skill checks passed"
 exit "$fail"

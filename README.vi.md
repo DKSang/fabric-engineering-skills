@@ -23,18 +23,42 @@ Cách sửa giống như onboard một consultant mới: đưa cho họ một b�
 
 ### 1. Cài skill
 
-**Claude Code**
+**Yêu cầu**: một AI coding tool (Claude Code, Codex, GitHub Copilot, Cursor, Gemini CLI, ...) và Git. Phần còn lại (Python 3.10 đến 3.13 cho Fabric CLI, Node.js LTS và Azure CLI cho Fabric MCP) do skill setup cài giúp hoặc đưa đúng lệnh cho hệ điều hành của bạn.
+
+Chọn **một** cách; cài cả hai thì mỗi skill sẽ bị trùng hai lần.
+
+**Claude Code (khuyên dùng): plugin**, tự cập nhật khi có bản mới:
 
 ```bash
 claude plugin marketplace add DKSang/fabric-engineering-skills
 claude plugin install fabric-engineering-skills@fabric-engineering
 ```
 
-**Codex, Copilot, Cursor và các agent khác**
+Hoặc gõ trong phiên: `/plugin marketplace add DKSang/fabric-engineering-skills` rồi `/plugin install fabric-engineering-skills@fabric-engineering`.
+
+**Cho cả team**: thêm `--scope project` vào cả hai lệnh rồi commit `.claude/settings.json`; ai mở repo cũng được mời cài plugin.
+
+**Codex, GitHub Copilot, Cursor và agent khác: `npx skills`**, copy các folder skill vào project thành file của bạn, sửa được:
 
 ```bash
 npx skills@latest add DKSang/fabric-engineering-skills
 ```
+
+Không hỏi, cài tất cả skill cho các agent đã chọn: `npx skills@latest add DKSang/fabric-engineering-skills --skill '*' --agent codex github-copilot cursor -y`. Thêm `-g` để cài cho user thay vì project.
+
+**Thủ công**: clone repo, copy nguyên từng folder trong `skills/*/` có chứa `SKILL.md` vào `.claude/skills/` (Claude Code) hoặc `.agents/skills/` (Codex và tool tương thích Agent Skills).
+
+**Cập nhật và gỡ cài đặt**
+
+| Cách cài | Cập nhật | Gỡ |
+| --- | --- | --- |
+| Plugin Claude Code | `claude plugin marketplace update fabric-engineering` rồi `claude plugin update fabric-engineering-skills@fabric-engineering`, hoặc bật auto-update trong `/plugin` → Marketplaces | `claude plugin uninstall fabric-engineering-skills@fabric-engineering` |
+| `npx skills` | `npx skills update` | `npx skills remove` |
+| Thủ công | `git pull` trong bản clone | xoá các folder |
+
+Gỡ skill không xoá những gì skill đã ghi vào repo (`AGENTS.md`, `reference/`, cấu hình MCP): đó là Fabric brain của bạn, vẫn dùng được mà không cần skill.
+
+**Kiểm tra**: mở phiên mới và gõ `/setup-fabric-engineering-skills`. Nếu không thấy lệnh, khởi động lại tool; với plugin, `claude plugin list` phải hiện `fabric-engineering-skills` ở trạng thái enabled.
 
 ### 2. Chạy `/setup-fabric-engineering-skills`
 
@@ -82,6 +106,10 @@ Agent hành động dưới danh nghĩa identity đăng nhập vào `fab`. Guard
 - **[document-fabric-workspace](./skills/brain/document-fabric-workspace/SKILL.md)** (người dùng gọi): lập danh mục workspace vào `reference/workspaces/<ws>.md` (item, bảng và schema, notebook và pipeline làm gì, lineage). Quét tăng dần: file state lưu fingerprint (ID item, hash definition trong repo, thời điểm sửa bảng) nên lần chạy sau chỉ đọc cái mới, đã đổi hoặc đã cũ. Chỉ đọc, không ghi vào Fabric.
 - **[fabric-retro](./skills/brain/fabric-retro/SKILL.md)** (người dùng gọi): chạy trước khi đóng phiên. Tìm lời sửa sai, bài học, sự thật chưa lưu và dòng đã cũ trong `reference/`, đề xuất từng thay đổi kèm bằng chứng, chỉ áp dụng cái bạn chọn.
 - **[build-in-fabric](./skills/build/build-in-fabric/SKILL.md)** (agent tự gọi): biến yêu cầu như "dựng bronze layer cho dữ liệu orders trong workspace dev" thành item chạy được: đọc convention, tra định dạng mới nhất trên Fabric MCP và Microsoft Learn, trình kế hoạch dry-run chờ bạn đồng ý, chỉ build trong workspace được phép (trực tiếp bằng `fab`, hoặc ghi definition vào repo đã kết nối Git), xác minh, rồi chạy test end-to-end kiểm tra dữ liệu và tự sửa lỗi.
+
+## License
+
+MIT. Xem [LICENSE](./LICENSE). Ghi chú phát hành trong [CHANGELOG.md](./CHANGELOG.md).
 
 ## Liên quan
 

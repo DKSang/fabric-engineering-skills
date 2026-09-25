@@ -14,7 +14,7 @@ Each skill is a folder with a `SKILL.md`, an `agents/openai.yaml` (Codex UI meta
 ## Invariants
 
 - Every skill in a shipped bucket (`setup/`, `brain/`, `build/`) is listed in `.claude-plugin/plugin.json`'s `skills` array, in the top-level `README.md` (skill name linked to its `SKILL.md`), in `README.vi.md`, and in its bucket's `README.md`. `in-progress/` skills appear in none of them.
-- Every skill is either **user-invoked** or **model-invoked**; see [.agents/invocation.md](./.agents/invocation.md). Keep `SKILL.md` frontmatter and `agents/openai.yaml` in sync.
+- Every skill is either **user-invoked** or **model-invoked**; see [.agents/invocation.md](../.agents/invocation.md). Keep `SKILL.md` frontmatter and `agents/openai.yaml` in sync.
 - The frontmatter `name` equals the folder name.
 - Run `claude plugin validate . --strict` and `scripts/check-skills.sh` after touching a manifest or adding, renaming or removing a skill.
 - Every `fab` command written in a skill must match the current CLI. Check with `fab <command> --help` before adding one.
@@ -22,8 +22,25 @@ Each skill is a folder with a `SKILL.md`, an `agents/openai.yaml` (Codex UI meta
 
 ## Shared vocabulary
 
-Terms used across skills are defined in [CONTEXT.md](./CONTEXT.md). Use them verbatim.
+Terms used across skills are defined in [CONTEXT.md](../CONTEXT.md). Use them verbatim.
+
+## Releasing
+
+1. Bump `version` in `.claude-plugin/plugin.json` (semver: a new skill or behaviour change is minor, a fix is patch) and add a `## <version>` section to `CHANGELOG.md`. `scripts/check-skills.sh` fails if the section is missing.
+2. Merge to `main`. The marketplace installs from the default branch, so nothing on a feature branch reaches users.
+3. Tag it: `claude plugin tag . --push` creates and pushes `fabric-engineering-skills--v<version>` after checking that `plugin.json` and `marketplace.json` agree.
+
+Installed users get the update through `claude plugin update` (or auto-update); `npx skills` users through `npx skills update`.
 
 ## Local testing
 
-`scripts/link-skills.sh` symlinks every shipped and in-progress skill into `~/.claude/skills` and `~/.agents/skills`, so a `git pull` keeps them current.
+`scripts/link-skills.sh` symlinks every shipped and in-progress skill into `~/.claude/skills` and `~/.agents/skills`, so a `git pull` keeps them current. To test the plugin exactly as users get it, without touching your own config:
+
+```bash
+export CLAUDE_CONFIG_DIR=$(mktemp -d)
+claude plugin marketplace add "$PWD"
+claude plugin install fabric-engineering-skills@fabric-engineering
+claude plugin list
+```
+
+`python -m unittest discover -s tests` runs the script tests.

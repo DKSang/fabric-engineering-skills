@@ -23,26 +23,80 @@ The fix is the same one you'd use for a new consultant: an onboarding package. A
 
 ### 1. Install the skills
 
+**Requirements**: an AI coding tool (Claude Code, Codex, GitHub Copilot, Cursor, Gemini CLI, ...) and Git. The setup skill installs the rest for you (Python 3.10 to 3.13 for the Fabric CLI, Node.js LTS and the Azure CLI for Fabric MCP) or tells you the exact command for your OS.
+
+Pick **one** route; installing both gives you every skill twice.
+
 <details open>
-<summary><strong>Claude Code</strong></summary>
+<summary><strong>Claude Code (recommended): plugin</strong></summary>
+
+A managed bundle that updates when a new version ships. From a terminal:
 
 ```bash
 claude plugin marketplace add DKSang/fabric-engineering-skills
 claude plugin install fabric-engineering-skills@fabric-engineering
 ```
 
+Or from inside a session:
+
+```
+/plugin marketplace add DKSang/fabric-engineering-skills
+/plugin install fabric-engineering-skills@fabric-engineering
+```
+
+**For a whole team**, declare it in the repo instead, so everyone who opens the repo is offered the plugin:
+
+```bash
+claude plugin marketplace add DKSang/fabric-engineering-skills --scope project
+claude plugin install fabric-engineering-skills@fabric-engineering --scope project
+```
+
+and commit `.claude/settings.json`.
+
+Skills are namespaced by the plugin: `/setup-fabric-engineering-skills` works, and so does `/fabric-engineering-skills:setup-fabric-engineering-skills` if another skill has the same name.
+
 </details>
 
 <details>
-<summary><strong>Codex, Copilot, Cursor and other agents</strong></summary>
+<summary><strong>Codex, GitHub Copilot, Cursor and other agents: <code>npx skills</code></strong></summary>
+
+Copies the skill folders into your project (`.agents/skills/`, `.claude/skills/`, ...) as ordinary files you own and can edit:
 
 ```bash
 npx skills@latest add DKSang/fabric-engineering-skills
 ```
 
-This copies the skill files into your project so you can edit them.
+The installer asks which skills and which agents. Non-interactive, all skills, chosen agents:
+
+```bash
+npx skills@latest add DKSang/fabric-engineering-skills --skill '*' --agent codex github-copilot cursor -y
+```
+
+Add `-g` to install for your user instead of this project.
 
 </details>
+
+<details>
+<summary><strong>Manual</strong></summary>
+
+Clone the repo and copy (or symlink) each folder under `skills/*/` that contains a `SKILL.md` into your agent's skills folder: `.claude/skills/` for Claude Code, `.agents/skills/` for Codex and other Agent Skills-compatible tools. Keep each folder whole: some skills ship files and scripts next to their `SKILL.md`.
+
+</details>
+
+<details>
+<summary><strong>Update, uninstall</strong></summary>
+
+| Route | Update | Uninstall |
+| --- | --- | --- |
+| Claude Code plugin | `claude plugin marketplace update fabric-engineering` then `claude plugin update fabric-engineering-skills@fabric-engineering`, or enable auto-update in `/plugin` → Marketplaces | `claude plugin uninstall fabric-engineering-skills@fabric-engineering` |
+| `npx skills` | `npx skills update` | `npx skills remove` |
+| Manual | `git pull` in your clone (symlinks pick it up) | delete the folders |
+
+Uninstalling the skills leaves everything they wrote in your repo (`AGENTS.md`, `reference/`, MCP config) in place: that's your Fabric brain, and it keeps working without the skills.
+
+</details>
+
+**Check the install**: start a new session and type `/setup-fabric-engineering-skills`. If the command isn't offered, restart the tool; for the plugin route, `claude plugin list` should show `fabric-engineering-skills` as enabled.
 
 ### 2. Run `/setup-fabric-engineering-skills`
 
@@ -129,6 +183,10 @@ User-invoked skills fire only when you type them; model-invoked skills are also 
 **Model-invoked**
 
 - **[build-in-fabric](./skills/build/build-in-fabric/SKILL.md)**: Turn "set up my bronze layer for the orders data in dev" into working items: load your conventions, research current formats on Fabric MCP and Microsoft Learn, present a dry-run plan for your yes, build only in the writable workspace (directly with `fab`, or as definitions in your Git-connected repo), verify, then run an end-to-end test that checks the data and fixes failures.
+
+## License
+
+MIT. See [LICENSE](./LICENSE). Release notes are in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Related
 
