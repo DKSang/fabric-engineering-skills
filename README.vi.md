@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/DKSang/fabric-engineering-skills)](./LICENSE)
 [![Checks](https://img.shields.io/github/actions/workflow/status/DKSang/fabric-engineering-skills/check.yml?branch=main&label=checks)](https://github.com/DKSang/fabric-engineering-skills/actions/workflows/check.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude_Code-plugin-D97757)](#cài-đặt)
-[![Agent Skills](https://img.shields.io/badge/Agent_Skills-Codex%20%7C%20Copilot%20%7C%20Cursor-4B32C3)](#cài-đặt)
+[![Agent Skills](https://img.shields.io/badge/Agent_Skills-dsh%20%7C%20Codex%20%7C%20Copilot%20%7C%20Cursor-4B32C3)](#cài-đặt)
 
 > **Preview.** Năm skill, đã kiểm tra với Fabric CLI 1.7 và Fabric MCP 1.4, và test bằng Claude Code headless với một `fab` giả lập. Chưa chạy trọn vẹn trên tenant thật. [Xem những gì đã test.](#mức-độ-ổn-định)
 
@@ -20,7 +20,7 @@ Biến bất kỳ repo nào thành một **Fabric brain**: một file `AGENTS.md
 > Set up my metadata-driven bronze layer for the orders data in my dev workspace
 ```
 
-Dùng được với Claude Code, GitHub Copilot, Codex, Cursor và Gemini CLI. Kiến thức nằm trong file thường, không nằm trong tool nào, nên đổi tool vẫn mang theo được.
+Dùng được với Claude Code, DeepSeek Harness (`dsh`), Codex, GitHub Copilot, Cursor và Gemini CLI. Kiến thức nằm trong file thường, không nằm trong tool nào, nên đổi tool vẫn mang theo được.
 
 ## Vấn đề
 
@@ -48,7 +48,7 @@ claude plugin marketplace add DKSang/fabric-engineering-skills
 claude plugin install fabric-engineering-skills@fabric-engineering
 ```
 
-**Codex, GitHub Copilot, Cursor và agent khác**: copy các folder skill vào project thành file của bạn.
+**DeepSeek Harness (`dsh`), Codex, GitHub Copilot, Cursor và agent khác**: copy các folder skill vào project thành file của bạn.
 
 ```bash
 npx skills@latest add DKSang/fabric-engineering-skills
@@ -64,7 +64,7 @@ Trong repo bạn muốn biến thành Fabric brain:
 /setup-fabric-engineering-skills
 ```
 
-Skill khám phá repo và máy, hỏi lần lượt vài câu (AI tool, workspace agent được sửa, identity đăng nhập, convention của bạn), cho xem bản nháp mọi file, rồi ghi, cài Fabric CLI và MCP server, và **giao việc đăng nhập cho bạn**: bạn tự chạy `fab auth login` và `az login` trong terminal, agent không bao giờ thấy secret. Khởi động lại agent rồi chạy:
+Skill khám phá repo và máy, hỏi lần lượt vài câu (cấu hình cho AI tool nào, mặc định chỉ tool bạn đang chạy; workspace agent được sửa; identity đăng nhập; convention của bạn), cho xem bản nháp mọi file, rồi ghi, cài Fabric CLI và MCP server, và **giao việc đăng nhập cho bạn**: bạn tự chạy `fab auth login` và `az login` trong terminal, agent không bao giờ thấy secret. Khởi động lại agent rồi chạy:
 
 ```
 /setup-fabric-engineering-skills verify
@@ -138,7 +138,7 @@ Một Fabric brain có bốn phần:
 
 | Phần | File | Vai trò |
 | --- | --- | --- |
-| **File chỉ dẫn** | `AGENTS.md` + các file trỏ một dòng (`CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md`, `.cursor/rules/agents.mdc`) | Cách agent hành xử: phạm vi, guardrail, quy tắc cố định, kiến thức nằm ở đâu |
+| **File chỉ dẫn** | `AGENTS.md` (dsh và Codex đọc trực tiếp) + file trỏ một dòng cho tool cần (`CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md`, `.cursor/rules/agents.mdc`) | Cách agent hành xử: phạm vi, guardrail, quy tắc cố định, kiến thức nằm ở đâu |
 | **File tham chiếu** | `reference/`: môi trường, naming convention, pattern kiến trúc, bài học, thuật ngữ, quyết định, danh mục workspace | Những gì bạn biết |
 | **Kết nối** | Fabric CLI `fab`; Microsoft Learn MCP và Fabric MCP (bắt buộc), thêm tuỳ chọn | Thông tin sống, và khả năng tạo và chạy item |
 | **Workflow** | các skill trong repo này | Những việc bạn lặp lại hằng ngày |
@@ -175,7 +175,7 @@ flowchart LR
 
 | Giai đoạn | Skill | Điều gì xảy ra |
 | --- | --- | --- |
-| Một lần mỗi repo | `/setup-fabric-engineering-skills` | Ghi `AGENTS.md`, file trỏ và `reference/`; cài Fabric CLI và MCP server; bạn đăng nhập; xác minh chỉ đọc |
+| Một lần mỗi repo | `/setup-fabric-engineering-skills` | Bạn chọn AI tool cần cấu hình; skill ghi `AGENTS.md`, file trỏ và cấu hình MCP cho các tool đó, và `reference/`; cài Fabric CLI và MCP server; bạn đăng nhập; xác minh chỉ đọc |
 | Sau khi khởi động lại, bất cứ lúc nào | `/setup-fabric-engineering-skills verify` | Kiểm tra lại đăng nhập, tenant, workspace và từng MCP server |
 | Mọi task | `fabric-brain` (tự động) | Đọc file `reference/` liên quan trước; cảnh báo yêu cầu mâu thuẫn; ghi lại điều bạn giải thích hoặc sửa |
 | Khi build | `build-in-fabric` (tự động) | Kế hoạch → dry run → bạn đồng ý → build trong workspace được ghi → xác minh → test end-to-end → sửa và chạy lại |
@@ -199,11 +199,12 @@ Skill "bạn gọi" chỉ chạy khi bạn gõ lệnh. Skill "agent gọi" còn 
 ```
 your-repo/
 ├── AGENTS.md                         ← chỉ dẫn chính (phạm vi, guardrail, quy tắc cố định, mục lục)
-├── CLAUDE.md                         ← file trỏ: @AGENTS.md
-├── .github/copilot-instructions.md   ← file trỏ (nếu dùng Copilot)
-├── GEMINI.md                         ← file trỏ (nếu dùng Gemini CLI)
-├── .mcp.json                         ← Microsoft Learn MCP + Fabric MCP
-├── .claude/settings.json             ← lệnh fab chỉ đọc chạy tự do, lệnh ghi luôn hỏi
+├── CLAUDE.md                         ← file trỏ: @AGENTS.md (nếu chọn Claude Code)
+├── .github/copilot-instructions.md   ← file trỏ (nếu chọn Copilot)
+├── GEMINI.md                         ← file trỏ (nếu chọn Gemini CLI)
+├── .mcp.json                         ← Microsoft Learn MCP + Fabric MCP (Claude Code)
+├── .dsh/fabric-engineering.cordis.yml ← hai server đó cho dsh (nếu chọn dsh)
+├── .claude/settings.json             ← lệnh fab chỉ đọc chạy tự do, lệnh ghi luôn hỏi (Claude Code)
 ├── reference/
 │   ├── environment.md                ← tenant, workspace, phạm vi
 │   ├── naming-conventions.md
@@ -214,7 +215,7 @@ your-repo/
 └── data/                             ← file mẫu cho phát triển
 ```
 
-Nó gộp vào file sẵn có, không ghi đè nội dung của bạn: mọi thứ nó quản lý nằm giữa hai marker `<!-- fabric-engineering-skills:start -->` và `<!-- fabric-engineering-skills:end -->`. Thay đổi trong `reference/` được để uncommitted để bạn review trong diff như mọi thay đổi khác.
+Chỉ tool bạn chọn mới được ghi file riêng; `AGENTS.md` và `reference/` luôn được ghi. Nó gộp vào file sẵn có, không ghi đè nội dung của bạn: mọi thứ nó quản lý nằm giữa hai marker `<!-- fabric-engineering-skills:start -->` và `<!-- fabric-engineering-skills:end -->`. Thay đổi trong `reference/` được để uncommitted để bạn review trong diff như mọi thay đổi khác.
 
 ## Kết nối
 
@@ -270,7 +271,7 @@ Skill có namespace theo plugin: `/setup-fabric-engineering-skills` chạy đư�
 </details>
 
 <details>
-<summary><strong>Codex, GitHub Copilot, Cursor và agent khác: <code>npx skills</code></strong></summary>
+<summary><strong>DeepSeek Harness, Codex, GitHub Copilot, Cursor và agent khác: <code>npx skills</code></strong></summary>
 
 ```bash
 npx skills@latest add DKSang/fabric-engineering-skills
@@ -283,6 +284,8 @@ npx skills@latest add DKSang/fabric-engineering-skills --skill '*' --agent codex
 ```
 
 Thêm `-g` để cài cho user thay vì project.
+
+Với **DeepSeek Harness (`dsh`)**, dùng `--agent universal`: skill được cài vào `.agents/skills/`, nơi dsh tự tìm. Sau đó setup ghi MCP server cho dsh vào `.dsh/fabric-engineering.cordis.yml`; khởi chạy bằng `dsh web --patch "$PWD/.dsh/fabric-engineering.cordis.yml"` (hoặc để setup gộp vào `~/.dsh/cordis.patch.yml`).
 
 </details>
 
@@ -358,6 +361,8 @@ Mọi lệnh `fab` viết trong skill phải khớp CLI hiện tại (`fab <comm
 | --- | --- | --- |
 | Cài qua plugin và `npx skills` | **Đã test** | Cả hai cách đều cài được từ GitHub; lệnh gõ tên ngắn và tên có namespace đều chạy |
 | Setup: file, file trỏ, cấu hình MCP, permission rule | **Đã test** | Định dạng và JSON đã validate |
+| Setup: chọn AI tool cần cấu hình | **Đã test** | Mặc định chỉ tool đang chạy setup; tool khác chỉ khi được chọn |
+| DeepSeek Harness (`dsh`) | **Đã kiểm tra** | Overlay MCP khởi động được trong dsh bản 2026-09 (các mục qua validate, Fabric MCP chạy); việc đọc `AGENTS.md`, thư mục skill và gọi `/skill` đã xác nhận trong source của dsh; chưa chạy với model |
 | Setup: lệnh `fab` và Fabric MCP | **Đã kiểm tra** | Theo help/source của Fabric CLI 1.7 và Fabric MCP 1.4 (đã xác minh danh sách tool `--read-only`) |
 | `fabric-brain` ghi nhớ và phát hiện mâu thuẫn | **Đã test** | Chạy Claude Code headless |
 | Các điểm dừng của `build-in-fabric` (phạm vi, đăng nhập, pattern chưa có, kế hoạch dry-run) | **Đã test** | Chạy headless với `fab` giả lập; không có lệnh ghi nào |

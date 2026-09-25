@@ -45,17 +45,17 @@ Read what exists; don't assume. Run read-only checks only.
 - `fab --version` and, if present, `fab auth status`
 - `node --version`, `npx --version` (**required**: Fabric MCP runs through `npx`)
 - `az --version` and, if present, `az account show --query "{tenant:tenantId, user:user.name}" -o json` (**required**: Fabric MCP's live tools authenticate through the Azure CLI sign-in)
-- Which AI tools are in use: you are running inside one; also look for `.claude/`, `.vscode/`, `.cursor/`, `.codex/`, `~/.codex/config.toml`.
+- Which AI tool is running this setup (you know which harness you are), and which others leave traces: `.claude/`, `.dsh/`, `~/.dsh/`, `.vscode/`, `.cursor/`, `.gemini/`, `~/.codex/config.toml`. These traces only label the choices in Section A; they never select anything.
 
 ### 2. Present findings and ask
 
 Summarise what's present and what's missing in a short table. Then take the sections in order: **one section, one answer, then the next.** Lead each with the recommended answer so the user can accept it in a word. Skip a section when exploration already settled it.
 
-**Section A: AI tools.**
+**Section A: AI tools.** See [AGENT-TOOLS.md](./AGENT-TOOLS.md).
 
-> Explainer: `AGENTS.md` is the open standard most AI coding tools read. Tools with their own file name get a one-line pointer to it, so the knowledge lives in your files, not inside any single tool.
+> Explainer: `AGENTS.md` is the open standard most AI coding tools read, and it's always written. Each tool you pick also gets its own pieces: a one-line pointer if it doesn't read `AGENTS.md` natively, and its MCP config. Tools you don't pick get nothing.
 
-Recommend: `AGENTS.md` + pointers for every tool found in step 1. Offer: Claude Code (`CLAUDE.md`), GitHub Copilot (`.github/copilot-instructions.md`), Gemini CLI (`GEMINI.md`), Cursor (`.cursor/rules/agents.mdc`), Codex (reads `AGENTS.md` natively, no pointer). See [POINTERS.md](./POINTERS.md).
+Show the numbered list from AGENT-TOOLS.md (Claude Code, DeepSeek Harness `dsh`, Codex, GitHub Copilot, Cursor, Gemini CLI), marking the one **running now** and any **found** in step 1. Default: **only the tool running now**. Ask the user to pick by number, and configure exactly those; never add a tool because its folder exists. Everything later in this skill that depends on the tool (pointers, MCP config, permission rules, restart and verify steps) applies to the picked tools only.
 
 **Section B: Guardrails and scope.**
 
@@ -121,9 +121,9 @@ Let them edit before anything is written.
 ### 4. Write
 
 - **`AGENTS.md`**: if it exists, insert or replace only the region between `<!-- fabric-engineering-skills:start -->` and `<!-- fabric-engineering-skills:end -->`; never touch the user's text outside it. If it doesn't exist, create it with the block.
-- **Pointer files**: same marker rule. If a `CLAUDE.md` already has real content, keep it and add the pointer block at the top.
-- **MCP config**: merge the chosen servers into the existing JSON/TOML. Keep every unrelated server and setting. If a server with the same name already exists and works, leave it alone and tell the user.
-- **`.claude/settings.json`** (Claude Code only): merge the permission rules from [FABRIC-CLI.md](./FABRIC-CLI.md#permission-rules). Keep existing rules.
+- **Pointer files**: only for the tools picked in Section A that need one (see [POINTERS.md](./POINTERS.md)). Same marker rule. If a `CLAUDE.md` already has real content, keep it and add the pointer block at the top.
+- **MCP config**: for each tool picked in Section A, in that tool's file from [AGENT-TOOLS.md](./AGENT-TOOLS.md). Merge the chosen servers into the existing JSON/TOML/YAML; keep every unrelated server and setting. For files outside the repo (Codex, dsh home patch), show the change and ask first. If a server with the same name already exists and works, leave it alone and tell the user.
+- **`.claude/settings.json`** (only if Claude Code was picked): merge the permission rules from [FABRIC-CLI.md](./FABRIC-CLI.md#permission-rules). Keep existing rules.
 - **`reference/`**: write seeds only for files that don't exist yet, in `fabric-brain`'s formats. `environment.md` gets the scope table from Section B now; IDs come in step 7. Put only facts the user confirmed; leave out sections you don't know rather than filling them with placeholders.
 - **`data/`**: create it with a one-line `README.md` ("Sample files for development. No production or personal data.").
 - **`.gitignore`**: append `.env` and `*.local.json` if missing. Never write a secret into any file.
@@ -152,7 +152,7 @@ Both are required: `fab` and Fabric MCP keep separate sign-ins. When the tenant 
 
 Claude Code users can also type `! fab auth login` in the prompt, but a separate terminal is more reliable for the interactive menu and the browser pop-up. If the agent runs in WSL or a container, the sign-in must happen **there**, not on the Windows host. See [FABRIC-CLI.md](./FABRIC-CLI.md#sign-in).
 
-Then tell them: new MCP servers only load in a new session. Ask them to **restart the agent** (or reload the MCP servers) and run `/setup-fabric-engineering-skills verify`. If they would rather continue now, run the parts of step 7 that don't need the new MCP servers and mark the rest as "pending restart".
+Then tell them: new MCP servers only load in a new session. Ask them to **restart the agent** (or reload the MCP servers) and run `/setup-fabric-engineering-skills verify`. For dsh, the restart is a new launch with the overlay: `dsh web --patch "$PWD/.dsh/fabric-engineering.cordis.yml"` (unless they merged it into `~/.dsh/cordis.patch.yml`). If they would rather continue now, run the parts of step 7 that don't need the new MCP servers and mark the rest as "pending restart".
 
 ### 7. Verify
 

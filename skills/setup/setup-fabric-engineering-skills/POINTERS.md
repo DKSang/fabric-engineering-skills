@@ -46,9 +46,9 @@ Read and follow `AGENTS.md` at the repo root before doing anything. It is the ca
 <!-- fabric-engineering-skills:end -->
 ```
 
-## Codex, OpenCode, Jules, Windsurf
+## Codex, DeepSeek Harness (`dsh`), OpenCode, Jules, Windsurf
 
-These read `AGENTS.md` natively. No pointer needed.
+These read `AGENTS.md` natively. No pointer needed. (dsh loads every one of `AGENTS.md` and `CLAUDE.md` that exists, so with a Claude Code pointer in the same repo it also reads the pointer's two lines. Harmless: they only repeat "follow `AGENTS.md`".)
 
 ## Rules
 
