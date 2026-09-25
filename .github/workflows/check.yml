@@ -1,0 +1,13 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check skill invariants
+        run: scripts/check-skills.sh

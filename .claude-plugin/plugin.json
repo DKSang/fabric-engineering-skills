@@ -1,0 +1,21 @@
+{
+  "name": "fabric-engineering-skills",
+  "version": "0.1.0",
+  "description": "Agent skills that turn a repo into a Fabric brain: AGENTS.md, reference docs, Fabric CLI and MCP servers, guardrails, verified sign-in. So you never explain your Microsoft Fabric setup twice.",
+  "author": {
+    "name": "DKSang",
+    "url": "https://github.com/DKSang"
+  },
+  "repository": "https://github.com/DKSang/fabric-engineering-skills",
+  "keywords": [
+    "microsoft-fabric",
+    "fabric-cli",
+    "mcp",
+    "agents-md",
+    "context-engineering",
+    "skills"
+  ],
+  "skills": [
+    "./skills/setup/setup-fabric-engineering-skills"
+  ]
+}
