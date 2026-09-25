@@ -16,6 +16,7 @@
     "skills"
   ],
   "skills": [
-    "./skills/setup/setup-fabric-engineering-skills"
+    "./skills/setup/setup-fabric-engineering-skills",
+    "./skills/brain/fabric-brain"
   ]
 }

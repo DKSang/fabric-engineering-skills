@@ -110,13 +110,20 @@ The agent acts as whoever signs in to `fab`. Written guardrails keep it honest, 
 
 - **[setup-fabric-engineering-skills](./skills/setup/setup-fabric-engineering-skills/SKILL.md)**: Turn this repo into a Fabric brain: write `AGENTS.md` and pointer files, seed `reference/`, install the Fabric CLI and MCP servers, walk you through sign-in, then verify every connection. Run once per repo; `verify` re-checks any time.
 
+### Brain
+
+**Model-invoked**
+
+- **[fabric-brain](./skills/brain/fabric-brain/SKILL.md)**: Read the relevant `reference/` files before Fabric work, and record every durable fact you explain or correct (conventions, environment facts, gotchas, business terms) in the right file, in the same turn. Owns the layout and formats of `reference/`.
+
+User-invoked skills fire only when you type them; model-invoked skills are also picked up by the agent on its own when the task fits.
+
 ### Roadmap
 
 Planned next, building on the brain the setup creates:
 
 | Skill | Job |
 | --- | --- |
-| `fabric-brain` | Capture durable facts into `reference/` the moment you explain them |
 | `verify-fabric-claims` | Check Fabric feature claims against Microsoft Learn before stating them |
 | `build-in-fabric` | Plan from `reference/`, dry run, build in the allowed workspace, verify, end-to-end test, fix, re-run |
 | `fabric-item-definitions` | Read and safely modify Git-connected item definitions (notebooks, pipelines, lakehouses) |

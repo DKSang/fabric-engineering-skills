@@ -90,18 +90,22 @@ Then offer the optional ones:
 
 Recommend, in this order: a **service principal** with Contributor on only the writable workspace(s) from Section B; otherwise **interactive sign-in with the user's own account**, restricted by the guardrails. Warn plainly if the user's account is a Fabric or tenant admin and recommend a playground tenant or a least-privilege identity instead. Do not collect secrets in chat; the user types them into `fab` directly.
 
-**Section E: Reference layout.** Default, write without asking:
+**Section E: Reference files.** Call the Skill tool with "fabric-brain": it owns the layout and formats of `reference/`. Setup seeds three files and a folder; the rest (`lessons.md`, `glossary.md`, `decisions/`, `workspaces/`) appear later, when there is something real to write:
 
 ```
 reference/
-├── environment.md          ← tenant, capacities, workspaces, scope
+├── environment.md          ← tenant, scope, workspaces (filled from Section B and step 7)
 ├── naming-conventions.md   ← how things are named
-├── fabric-cli.md           ← how the agent uses fab here
-└── architecture/           ← one file per pattern (e.g. medallion-bronze.md), created on demand
+├── fabric-cli.md           ← how the agent uses fab here (seed in FABRIC-CLI.md)
+└── architecture/           ← one file per pattern, created when the user describes one
 data/                       ← sample files the agent may use during development
 ```
 
-Ask one question only: _"Do you already have naming conventions or architecture notes written down somewhere (wiki, doc, another repo)?"_ If yes, read them (with permission) and seed `reference/` from them instead of from the templates.
+Ask, one at a time:
+
+1. _"Do you already have naming conventions or architecture notes written down somewhere (wiki, doc, another repo)?"_ If yes, read them (with permission) and convert them into `fabric-brain`'s formats instead of starting blank.
+2. If not: _"Want a starter set of naming conventions to edit?"_ (recommend: **yes**). Show `fabric-brain`'s starter set and write only what the user keeps. Never record invented conventions as fact.
+3. _"Is there a pattern you always build the same way (e.g. your bronze layer, a metadata-driven loader)? Describe it in a few sentences."_ If yes, write `reference/architecture/<pattern>.md`. If no, skip; it can come later.
 
 ### 3. Confirm
 
@@ -110,7 +114,7 @@ Show the user a draft of:
 - The `AGENTS.md` block (from [AGENTS-TEMPLATE.md](./AGENTS-TEMPLATE.md)), filled in with Sections A to E
 - Each pointer file
 - The MCP entries to merge into each config file, and the permission rules for `.claude/settings.json` (Claude Code only)
-- The `reference/` seeds (from [REFERENCE-SEEDS.md](./REFERENCE-SEEDS.md))
+- The `reference/` seeds, in `fabric-brain`'s formats
 
 Let them edit before anything is written.
 
@@ -120,7 +124,7 @@ Let them edit before anything is written.
 - **Pointer files**: same marker rule. If a `CLAUDE.md` already has real content, keep it and add the pointer block at the top.
 - **MCP config**: merge the chosen servers into the existing JSON/TOML. Keep every unrelated server and setting. If a server with the same name already exists and works, leave it alone and tell the user.
 - **`.claude/settings.json`** (Claude Code only): merge the permission rules from [FABRIC-CLI.md](./FABRIC-CLI.md#permission-rules). Keep existing rules.
-- **`reference/`**: write seeds only for files that don't exist yet. Put only facts the user confirmed; leave sections you don't know out rather than filling them with placeholders.
+- **`reference/`**: write seeds only for files that don't exist yet, in `fabric-brain`'s formats. `environment.md` gets the scope table from Section B now; IDs come in step 7. Put only facts the user confirmed; leave out sections you don't know rather than filling them with placeholders.
 - **`data/`**: create it with a one-line `README.md` ("Sample files for development. No production or personal data.").
 - **`.gitignore`**: append `.env` and `*.local.json` if missing. Never write a secret into any file.
 
@@ -167,5 +171,5 @@ Tell the user:
 
 - what was written (a short file list) and what was verified
 - how to start: open a new session and ask for a Fabric task without restating their conventions; the agent reads `AGENTS.md` first
-- that `reference/` is theirs to grow: whenever they explain something durable, the agent should add it there, so the brain gets smarter every session
+- that `reference/` is theirs to grow: whenever they explain or correct something durable, the agent records it there in the same turn (the `fabric-brain` skill), so the brain gets smarter every session. They review those changes in the Git diff like any other change
 - that re-running this skill is only needed to change tools, scope or MCP servers; `/setup-fabric-engineering-skills verify` re-checks the connections any time

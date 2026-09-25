@@ -35,7 +35,7 @@ Fabric changes monthly and your training data has a cutoff. Before stating that 
 
 ## Keep the brain current
 
-When the user explains something durable (a convention, an environment fact, a gotcha, a correction), update the right `reference/` file in the same turn and say in one line what you recorded. Never record secrets.
+When the user explains something durable (a convention, an environment fact, a gotcha, a correction), update the right `reference/` file in the same turn and say in one line what you recorded. Corrections matter most: fix the line that misled you. Never record secrets. If the `fabric-brain` skill is available, use it: it has the routing and formats.
 
 ## Reference
 
@@ -43,6 +43,8 @@ When the user explains something durable (a convention, an environment fact, a g
 - `reference/naming-conventions.md`: how items, tables, columns and activities are named
 - `reference/fabric-cli.md`: how to use `fab` in this repo
 - `reference/architecture/`: one file per pattern we use {list the files, e.g. `medallion-bronze.md`}
+
+Created when first needed, then listed here: `reference/lessons.md` (gotchas and fixes), `reference/glossary.md` (business terms), `reference/decisions/` (hard-to-reverse choices), `reference/workspaces/` (per-workspace inventories).
 
 ## Folders
 

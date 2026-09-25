@@ -19,6 +19,14 @@ A tool-specific file (`CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md
 Everything under `reference/` in the user's repo: environment, naming conventions, CLI notes, architecture patterns. Knowledge, not behaviour.
 _Avoid_: docs (too broad), context files
 
+**Durable fact**:
+Something about the user's Fabric work that will still be true next week and that a future session would otherwise have to ask for again. Only durable facts go into **reference files**.
+_Avoid_: memory, note
+
+**Capture**:
+Recording a **durable fact** in the right **reference file** in the same turn it came up. Done by `fabric-brain`.
+_Avoid_: save, remember (as verbs for this)
+
 **Scope**:
 The set of workspaces the agent may modify. Everything outside it is read-only.
 _Avoid_: allowlist (fine for the hook implementation only)

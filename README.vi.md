@@ -77,8 +77,9 @@ Agent hành động dưới danh nghĩa identity đăng nhập vào `fab`. Guard
 ## Skill
 
 - **[setup-fabric-engineering-skills](./skills/setup/setup-fabric-engineering-skills/SKILL.md)** (người dùng gọi): biến repo thành Fabric brain, cài CLI và MCP, hướng dẫn đăng nhập, rồi xác minh mọi kết nối.
+- **[fabric-brain](./skills/brain/fabric-brain/SKILL.md)** (agent tự gọi): đọc các file `reference/` liên quan trước khi làm việc Fabric, và ghi lại mọi điều lâu dài bạn giải thích hoặc sửa (convention, môi trường, lỗi đã gặp, thuật ngữ nghiệp vụ) vào đúng file, ngay trong lượt đó. Sở hữu bố cục và định dạng của `reference/`.
 
-Các skill tiếp theo (`fabric-brain`, `verify-fabric-claims`, `build-in-fabric`, `fabric-item-definitions`, `document-fabric-workspace`, `fabric-guardrails`, `fabric-retro`) nằm trong [roadmap](./README.md#roadmap).
+Các skill tiếp theo (`verify-fabric-claims`, `build-in-fabric`, `fabric-item-definitions`, `document-fabric-workspace`, `fabric-guardrails`, `fabric-retro`) nằm trong [roadmap](./README.md#roadmap).
 
 ## Liên quan
 

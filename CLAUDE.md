@@ -5,7 +5,7 @@ Maintainer notes for this repo. (The instruction files this repo's skills *gener
 Skills live in bucket folders under `skills/`:
 
 - `setup/`: run-once scaffolding and connection setup
-- `brain/`: capturing and maintaining context in `reference/` (planned)
+- `brain/`: capturing and maintaining context in `reference/`
 - `build/`: daily Fabric work on top of the brain (planned)
 - `in-progress/`: public on purpose, feedback wanted, not shipped in the plugin
 
