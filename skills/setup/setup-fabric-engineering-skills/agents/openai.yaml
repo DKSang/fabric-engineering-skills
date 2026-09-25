@@ -1,0 +1,5 @@
+interface:
+  display_name: "Setup Fabric Engineering Skills"
+  short_description: "Turn a repo into a Fabric brain for AI"
+policy:
+  allow_implicit_invocation: false

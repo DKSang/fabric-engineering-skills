@@ -1,0 +1,5 @@
+interface:
+  display_name: "Fabric Retro"
+  short_description: "End-of-session sweep of what the brain should keep"
+policy:
+  allow_implicit_invocation: false

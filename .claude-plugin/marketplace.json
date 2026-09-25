@@ -1,0 +1,22 @@
+{
+  "name": "fabric-engineering",
+  "owner": {
+    "name": "DKSang",
+    "url": "https://github.com/DKSang"
+  },
+  "description": "Fabric engineering skills for AI coding agents, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "fabric-engineering-skills",
+      "source": "./",
+      "description": "Turn a repo into a Fabric brain: AGENTS.md, reference docs, Fabric CLI and MCP servers, guardrails, verified sign-in.",
+      "category": "development",
+      "keywords": [
+        "microsoft-fabric",
+        "fabric-cli",
+        "mcp",
+        "agents-md"
+      ]
+    }
+  ]
+}
