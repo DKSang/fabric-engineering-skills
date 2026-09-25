@@ -16,7 +16,7 @@ Cách sửa giống như onboard một consultant mới: đưa cho họ một b�
 | --- | --- | --- |
 | **File chỉ dẫn** | `AGENTS.md` (+ các file trỏ một dòng: `CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md`) | Cách agent hành xử: guardrail, quy tắc cố định, kiến thức nằm ở đâu |
 | **File tham chiếu** | `reference/environment.md`, `naming-conventions.md`, `fabric-cli.md`, `architecture/*.md` | Những gì bạn biết: tenant, convention, pattern |
-| **Kết nối** | `.mcp.json` (Microsoft Learn MCP, Fabric MCP), Fabric CLI `fab` | Thông tin sống: tài liệu mới nhất, và khả năng tạo và chạy item trong Fabric |
+| **Kết nối** | Fabric CLI `fab`, và trong `.mcp.json` hai server bắt buộc **Microsoft Learn MCP** và **Fabric MCP** | Thông tin sống: tài liệu mới nhất, schema item thật, OneLake, và khả năng tạo và chạy item trong Fabric |
 | **Workflow** | các skill như trong repo này | Những việc bạn lặp lại hằng ngày |
 
 ## Bắt đầu nhanh
@@ -48,9 +48,9 @@ Chạy một lần trong repo bạn muốn biến thành Fabric brain. Skill s�
    - `fab` đăng nhập bằng identity nào
 3. **Cho xem bản nháp** mọi thứ sẽ ghi, bạn sửa được trước khi ghi
 4. **Ghi** `AGENTS.md`, các file trỏ, `reference/`, `data/`, và gộp MCP server và permission rule vào cấu hình sẵn có
-5. **Cài** Fabric CLI và các MCP server đã chọn
-6. **Giao phần đăng nhập cho bạn**: bạn tự chạy `fab auth login` (và `az login` nếu cần) trong terminal của mình. Agent không bao giờ thấy mật khẩu hay secret
-7. **Xác minh** (chỉ đọc): đã đăng nhập, đúng tenant, thấy workspace, MCP server trả lời thật. Kết quả là bảng pass/fail, kèm cách sửa cho từng lỗi
+5. **Cài** Node.js, Azure CLI và Fabric CLI nếu chưa có, và kết nối hai MCP server bắt buộc: **Microsoft Learn MCP** (tài liệu mới nhất) và **Fabric MCP** (schema item, API spec, OneLake; mặc định chỉ đọc để mọi thay đổi đều đi qua `fab`). Các Fabric MCP khác là tuỳ chọn
+6. **Giao phần đăng nhập cho bạn**: bạn tự chạy `fab auth login` và `az login` trong terminal của mình. Agent không bao giờ thấy mật khẩu hay secret
+7. **Xác minh** (chỉ đọc): đã đăng nhập, `fab` và `az` cùng tenant, thấy workspace, cả hai MCP server trả lời thật. Kết quả là bảng pass/fail, kèm cách sửa cho từng lỗi
 
 MCP server mới chỉ được nạp trong phiên mới, nên khởi động lại agent rồi chạy:
 

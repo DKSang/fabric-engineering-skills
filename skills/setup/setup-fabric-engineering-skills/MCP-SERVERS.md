@@ -1,15 +1,15 @@
 # MCP servers
 
-The connections that give the agent live information. Configure only the ones the user chose in Section C, and only for the tools they use (Section A). Always **merge** into existing config files: keep every unrelated server and setting.
+The connections that give the agent live information. Two are **required** on every setup; the rest are optional and configured only when chosen in Section C. Configure each for the tools the user uses (Section A). Always **merge** into existing config files: keep every unrelated server and setting.
 
-| Server | What it gives the agent | Auth | Needs |
-| --- | --- | --- | --- |
-| `microsoft-learn` | Search and fetch current Microsoft Learn docs and code samples | None | Nothing |
-| `fabric-mcp` (local) | Fabric OpenAPI specs, item definition JSON schemas, best practices, OneLake file operations | Azure sign-in, only for the OneLake / live tools | Node.js LTS |
-| Microsoft remote Fabric MCPs | FabricIQ (discovery, DAX), Power BI modeling, SQL endpoint queries | Azure CLI sign-in (`az login`) | Azure CLI |
-| `fabric-rti-mcp` | Eventhouse / KQL queries, Eventstreams | Azure sign-in | `uv` (Python) |
+| Server | Required? | What it gives the agent | Auth | Needs |
+| --- | --- | --- | --- | --- |
+| `microsoft-learn` | **yes** | Search and fetch current Microsoft Learn docs and code samples | None | Nothing |
+| `fabric-mcp` (local) | **yes** | Fabric OpenAPI specs, item definition JSON schemas, best practices, examples (offline); OneLake files and tables, workspaces and items (live) | Azure CLI sign-in, for the live tools | Node.js LTS, Azure CLI |
+| Microsoft remote Fabric MCPs | optional | FabricIQ (discovery, DAX), Power BI modeling, SQL endpoint queries | Azure CLI sign-in | Azure CLI |
+| `fabric-rti-mcp` | optional | Eventhouse / KQL queries, Eventstreams | Azure sign-in | `uv` (Python) |
 
-## Microsoft Learn MCP (always)
+## Microsoft Learn MCP (required)
 
 Endpoint: `https://learn.microsoft.com/api/mcp` (streamable HTTP, no auth). Tools: `microsoft_docs_search`, `microsoft_docs_fetch`, `microsoft_code_sample_search`.
 
@@ -74,9 +74,30 @@ url = "https://learn.microsoft.com/api/mcp"
 }
 ```
 
-## Fabric MCP, local (`@microsoft/fabric-mcp`)
+## Fabric MCP, local (required)
 
-Open source, from [microsoft/mcp](https://github.com/microsoft/mcp/tree/main/servers/Fabric.Mcp.Server). The docs tools (`docs_list-item-types`, `docs_item-definitions`, `docs_best-practices`, ...) work offline from bundled specs; the OneLake and core tools act on the live tenant with the user's Azure sign-in, so they fall under the same guardrails as `fab`.
+Package `@microsoft/fabric-mcp`, open source in [microsoft/mcp](https://github.com/microsoft/mcp/tree/main/servers/Fabric.Mcp.Server). Tool groups:
+
+| Group | Examples | Touches the tenant? |
+| --- | --- | --- |
+| `docs` | `list-item-types`, `item-definitions`, `item-api-spec`, `best-practices`, `api-examples` | no, bundled specs, no auth |
+| `onelake` | `list-workspaces`, `list-items`, `list-files`, `list-tables`, `upload-file`, `delete-file` | yes |
+| `core`, `datafactory` | `create-item`, list and run pipelines, dataflows | yes |
+
+### Arguments
+
+```
+npx -y @microsoft/fabric-mcp@latest server start --mode all --read-only
+```
+
+- `--mode all` exposes every tool individually (names like `docs_list-item-types`), which models pick more reliably than the default one-tool-per-group mode.
+- `--read-only` blocks every write tool. **Default: on.** Writes then go through `fab`, where each one hits a permission prompt and the guardrails, so there is one audited path that changes Fabric. Drop the flag only if the user explicitly wants the MCP to write (Section B).
+
+### Authentication
+
+Running as an MCP server, Fabric MCP never opens a browser; it takes an existing sign-in from a chain (environment variables, Visual Studio, VS Code, Azure CLI, ...). Pin it to the Azure CLI with `AZURE_TOKEN_CREDENTIALS=AzureCliCredential` so it uses the same, verified identity as `az login` and never silently picks a VS Code account from another tenant.
+
+### Config
 
 **Claude Code** (`.mcp.json`), **Cursor** (`.cursor/mcp.json`):
 
@@ -85,23 +106,38 @@ Open source, from [microsoft/mcp](https://github.com/microsoft/mcp/tree/main/ser
   "mcpServers": {
     "fabric-mcp": {
       "command": "npx",
-      "args": ["-y", "@microsoft/fabric-mcp@latest", "server", "start", "--mode", "all"]
+      "args": ["-y", "@microsoft/fabric-mcp@latest", "server", "start", "--mode", "all", "--read-only"],
+      "env": {
+        "AZURE_TOKEN_CREDENTIALS": "AzureCliCredential"
+      }
     }
   }
 }
 ```
 
-**VS Code**: recommend the [Fabric MCP Server extension](https://marketplace.visualstudio.com/items?itemName=fabric.vscode-fabric-mcp-server) instead of a hand-written entry. Manual entry: same `command`/`args` under `"servers"` with `"type": "stdio"`.
+**VS Code** (`.vscode/mcp.json`): the same entry under `"servers"` with `"type": "stdio"`. The [Fabric MCP Server extension](https://marketplace.visualstudio.com/items?itemName=fabric.vscode-fabric-mcp-server) is an alternative, but a committed `mcp.json` keeps the flags and the server name identical for the whole team.
 
 **Codex** (`~/.codex/config.toml`):
 
 ```toml
 [mcp_servers.fabric-mcp]
 command = "npx"
-args = ["-y", "@microsoft/fabric-mcp@latest", "server", "start", "--mode", "all"]
+args = ["-y", "@microsoft/fabric-mcp@latest", "server", "start", "--mode", "all", "--read-only"]
+env = { AZURE_TOKEN_CREDENTIALS = "AzureCliCredential" }
 ```
 
-On Windows, if `npx` fails to start from the tool, use `"command": "cmd"` with `"args": ["/c", "npx", "-y", ...]`.
+**Gemini CLI** (`.gemini/settings.json`): same `command`, `args` and `env` under `"mcpServers"`.
+
+On Windows, if the tool can't spawn `npx` directly, use `"command": "cmd"` with `"args": ["/c", "npx", "-y", ...]`.
+
+### Also a command line
+
+The same package runs one-off commands in a terminal, which is how [VERIFY.md](./VERIFY.md) checks it before a restart:
+
+```
+npx -y @microsoft/fabric-mcp@latest docs list-item-types
+npx -y @microsoft/fabric-mcp@latest onelake list-workspaces
+```
 
 ## Microsoft remote Fabric MCPs
 

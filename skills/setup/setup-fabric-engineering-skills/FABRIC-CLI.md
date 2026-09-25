@@ -47,15 +47,17 @@ Check the result without exposing anything: `fab auth status`. It prints the acc
 
 Sign out: `fab auth logout`.
 
-## Azure CLI (`az`), only for MCP servers that need it
+## Node.js and Azure CLI
 
-The local Fabric MCP's live tools and Microsoft's remote Fabric MCPs use the Azure CLI sign-in, which is separate from `fab`'s.
+Both are required by Fabric MCP: Node.js runs it (`npx`), and its live tools take their token from the Azure CLI sign-in, which is separate from `fab`'s. Microsoft's remote Fabric MCPs use the same Azure CLI sign-in.
 
-| OS | Install |
-| --- | --- |
-| Windows | `winget install --exact --id Microsoft.AzureCLI` |
-| macOS | `brew install azure-cli` |
-| Linux | <https://learn.microsoft.com/cli/azure/install-azure-cli-linux> |
+| OS | Node.js LTS | Azure CLI |
+| --- | --- | --- |
+| Windows | `winget install --exact --id OpenJS.NodeJS.LTS` | `winget install --exact --id Microsoft.AzureCLI` |
+| macOS | `brew install node` | `brew install azure-cli` |
+| Linux | <https://nodejs.org/en/download/package-manager> | <https://learn.microsoft.com/cli/azure/install-azure-cli-linux> |
+
+After installing, the user usually needs a new terminal (and a restart of the AI tool) before `node` and `az` are on PATH.
 
 Sign in (user runs it): `az login`, or `az login --tenant <tenant-id> --allow-no-subscriptions` when the tenant has no Azure subscription. Both `fab` and `az` must point at the **same tenant**; [VERIFY.md](./VERIFY.md) checks this.
 
@@ -77,7 +79,11 @@ Claude Code only: merge into `.claude/settings.json`. Read-only `fab` commands r
       "Bash(fab pwd)",
       "Bash(fab config ls)",
       "Bash(fab job run-status:*)",
-      "Bash(fab job run-list:*)"
+      "Bash(fab job run-list:*)",
+      "Bash(npx -y @microsoft/fabric-mcp@latest docs:*)",
+      "Bash(npx -y @microsoft/fabric-mcp@latest onelake list-workspaces:*)",
+      "Bash(az --version)",
+      "Bash(az account show:*)"
     ],
     "ask": [
       "Bash(fab mkdir:*)",

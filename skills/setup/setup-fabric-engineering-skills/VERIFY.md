@@ -29,11 +29,12 @@ Run the checks in order; a later check is meaningless if an earlier one failed. 
 
 C4 checks visibility only. It does not prove write permission, and you must not test write permission by writing. If the user wants that confirmed, ask them to check the identity's role in the workspace's **Manage access** pane.
 
-### Azure CLI (only if remote Fabric MCPs or the local Fabric MCP were chosen)
+### Node.js and Azure CLI (required by Fabric MCP)
 
 | # | Check | Command | Pass when |
 | --- | --- | --- | --- |
-| A1 | Installed | `az --version` | prints a version |
+| N1 | Node installed | `node --version` | v20 or newer |
+| A1 | Azure CLI installed | `az --version` | prints a version |
 | A2 | Signed in | `az account show --query "{tenant:tenantId, user:user.name}" -o json` | returns a tenant |
 | A3 | Same tenant as `fab` | compare A2 `tenant` with C2 `Tenant ID` | identical |
 | A4 | Can get a Fabric token | `az account get-access-token --resource https://api.fabric.microsoft.com --query expiresOn -o tsv` | prints an expiry time (the `--query expiresOn` is what keeps the token itself out of the output; never drop it) |
@@ -46,10 +47,23 @@ If the current session started before the MCP config was written, mark these **p
 | --- | --- | --- | --- |
 | M1 | Server registered and connected | Claude Code: `claude mcp list` (and ask the user to glance at `/mcp`). Codex: `/mcp`. VS Code: **MCP: List Servers**. | each chosen server shows connected / running |
 | M2 | Microsoft Learn answers | call `microsoft_docs_search` with `"Microsoft Fabric lakehouse schemas"` | returns results with `learn.microsoft.com` URLs |
-| M3 | Fabric MCP answers (if chosen) | call `docs_list-item-types` | returns a list including `Lakehouse` and `Notebook` |
-| M4 | Remote Fabric MCPs (if chosen) | call a read-only discovery tool the server exposes (e.g. FabricIQ artifact search for a workspace from Section B) | returns data, no auth error |
+| M3 | Fabric MCP answers (required) | call `docs_list-item-types` | returns item types including `lakehouse` and `notebook` |
+| M4 | Fabric MCP reaches the tenant (required) | call `onelake_list-workspaces` | lists the writable workspaces from Section B, no auth error |
+| M5 | Fabric MCP is read-only (if agreed in Section B) | look at the tool list | no `create`, `upload`, `delete` tools (e.g. no `core_create-item`, `onelake_delete-file`) |
+| M6 | Remote Fabric MCPs (if chosen) | call a read-only discovery tool the server exposes (e.g. FabricIQ artifact search for a workspace from Section B) | returns data, no auth error |
 
-Installation success is not connection success. Only an actual tool call counts for M2 to M4.
+Installation success is not connection success. Only an actual tool call counts for M2 to M6.
+
+**Before a restart**, Fabric MCP can still be checked from the terminal, because the same package runs one-off commands. Run these instead of M3 and M4, and keep M1 and M5 as "pending restart":
+
+```
+npx -y @microsoft/fabric-mcp@latest docs list-item-types
+AZURE_TOKEN_CREDENTIALS=AzureCliCredential npx -y @microsoft/fabric-mcp@latest onelake list-workspaces
+```
+
+(PowerShell: `$env:AZURE_TOKEN_CREDENTIALS="AzureCliCredential"; npx -y @microsoft/fabric-mcp@latest onelake list-workspaces`.) Pinning the credential matters here: without it the command line may open a browser sign-in instead of using `az`.
+
+**Setup is not complete** until M2, M3 and M4 pass. Say so plainly in the report if they don't.
 
 ### Guardrails
 
@@ -80,6 +94,9 @@ Installation success is not connection success. Only an actual tool call counts 
 | Service principal gets `Unauthorized` / `PrincipalTypeNotSupported` | Tenant setting "Service principals can use Fabric APIs" is off for it, or it has no workspace role | A Fabric admin enables the setting for its security group; add it to the workspace |
 | A3 tenant mismatch | `az` defaulted to another tenant | `az login --tenant <tenant-id> --allow-no-subscriptions` |
 | `az login` fails with "no subscriptions found" | Tenant has Fabric but no Azure subscription | Add `--allow-no-subscriptions` |
+| M4 fails with a credential error | `az login` missing where the agent runs, or signed in to another tenant | Fix A2 and A3; the MCP reads the Azure CLI sign-in only (pinned by `AZURE_TOKEN_CREDENTIALS`) |
+| M4 works but a writable workspace is missing | The Azure CLI identity differs from the `fab` identity | Sign `az` in as the same user or principal as `fab` |
+| First Fabric MCP start times out | `npx` downloading the package during the first session | Run `npx -y @microsoft/fabric-mcp@latest --help` once, then restart |
 | MCP server not listed | Session started before the config was written, or config in the wrong file for this tool | Restart the tool; check the path against MCP-SERVERS.md |
 | Claude Code shows the project server as disabled | Project-scoped servers need approval | User approves it in `/mcp` |
 | `npx` server fails to start on Windows | Tool can't spawn `npx` directly | Use `"command": "cmd"`, `"args": ["/c", "npx", ...]` |

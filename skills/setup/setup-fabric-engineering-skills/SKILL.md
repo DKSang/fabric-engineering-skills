@@ -13,7 +13,7 @@ The setup has four pieces:
 
 - **Instruction file**: `AGENTS.md`, the canonical file every tool reads, plus tiny pointer files for tools that use their own name (`CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md`)
 - **Reference files**: `reference/`, the knowledge (environment, naming conventions, architecture, CLI notes)
-- **Connections**: MCP servers (Microsoft Learn first) and the Fabric CLI (`fab`)
+- **Connections**: the Fabric CLI (`fab`) and two required MCP servers, **Microsoft Learn MCP** and **Fabric MCP**, plus optional extras
 - **Guardrails**: which workspaces the agent may touch, and what needs confirmation
 
 This is a prompt-driven skill, not a script. Explore, present what you found, confirm with the user, write, install, hand sign-in to the user, then verify.
@@ -43,8 +43,8 @@ Read what exists; don't assume. Run read-only checks only.
 - `python --version` / `python3 --version` (the Fabric CLI needs Python 3.10 or newer)
 - `pipx --version`, `uv --version` (preferred installers for CLI tools)
 - `fab --version` and, if present, `fab auth status`
-- `node --version`, `npx --version` (needed for the local Fabric MCP server)
-- `az --version` and, if present, `az account show --query "{tenant:tenantId, user:user.name}" -o json` (needed for the remote Fabric MCP servers)
+- `node --version`, `npx --version` (**required**: Fabric MCP runs through `npx`)
+- `az --version` and, if present, `az account show --query "{tenant:tenantId, user:user.name}" -o json` (**required**: Fabric MCP's live tools authenticate through the Azure CLI sign-in)
 - Which AI tools are in use: you are running inside one; also look for `.claude/`, `.vscode/`, `.cursor/`, `.codex/`, `~/.codex/config.toml`.
 
 ### 2. Present findings and ask
@@ -66,13 +66,21 @@ Ask, in order, one at a time:
 1. Which workspace(s) may the agent **create or modify** items in? (recommend: one DEV or playground workspace). Record exact names.
 2. Are there workspaces it may **read** but never change (e.g. PRD)? (recommend: yes, every other workspace is read-only)
 3. Keep the default safety rules? (recommend: **yes**: dry run first, confirm every destructive or write operation, never print secrets or tokens)
+4. Run Fabric MCP read-only? (recommend: **yes**: the agent still reads OneLake, tables and schemas through it, but every change goes through `fab`, where each one asks you first). See [MCP-SERVERS.md](./MCP-SERVERS.md#arguments).
 
 **Section C: Connections (MCP servers).** See [MCP-SERVERS.md](./MCP-SERVERS.md).
 
 > Explainer: Every model has a training cutoff, and Fabric ships features monthly. MCP servers let the agent look things up live instead of guessing.
 
-- **Microsoft Learn MCP**: always recommend. Official, free, no authentication. Powers the standing rule "verify Fabric claims against Microsoft Learn".
-- **Fabric MCP (local)**: recommend when Node is available. Fabric API specs, item definition schemas, best practices, OneLake operations.
+Two servers are **required** and installed on every run; don't ask whether to add them, only tell the user they're coming:
+
+- **Microsoft Learn MCP** (`microsoft-learn`): official, free, no authentication. Powers the standing rule "verify Fabric claims against Microsoft Learn".
+- **Fabric MCP** (`fabric-mcp`, local): Fabric API specs, item definition schemas and best practices (work offline), plus live OneLake and workspace tools (use the Azure CLI sign-in). It is what lets the agent build item definitions that match the real schema instead of guessing. It needs Node.js and the Azure CLI; if either is missing, step 5 installs it before anything else.
+
+If the user objects to a required server, explain what they lose (no live docs means confident wrong answers about new features; no Fabric MCP means guessed item schemas) and that the setup is not complete without it. If they still refuse, stop and tell them to re-run the skill when they're ready; don't write a half setup.
+
+Then offer the optional ones:
+
 - **Microsoft Fabric remote MCPs** (FabricIQ, Power BI modeling, SQL endpoint): offer when the user works with semantic models or SQL endpoints. Needs Azure CLI sign-in. On Claude Code, recommend installing Microsoft's `fabric-skills` plugin, which configures them, rather than copying entries by hand.
 - **Fabric RTI MCP**: offer only when the user mentions Eventhouse, KQL or Real-Time Intelligence.
 
@@ -118,10 +126,11 @@ Let them edit before anything is written.
 
 ### 5. Install
 
-Install only what was chosen and is missing. Show each command, then run it with the user's approval. Follow [FABRIC-CLI.md](./FABRIC-CLI.md#install) and [MCP-SERVERS.md](./MCP-SERVERS.md).
+Install what is required or chosen and missing. Required first, in this order: Node.js, Azure CLI, Fabric CLI; then the MCP config is already in place from step 4. Show each command, then run it with the user's approval. Follow [FABRIC-CLI.md](./FABRIC-CLI.md#install) and [MCP-SERVERS.md](./MCP-SERVERS.md).
 
 - Fabric CLI: `pipx install ms-fabric-cli` (or `uv tool install ms-fabric-cli`, or `pip install --user ms-fabric-cli`). Confirm with `fab --version`.
-- Azure CLI, Node: these need an OS installer (winget, Homebrew, apt). Give the user the exact command for their OS; run it only if they ask you to.
+- **Node.js LTS** and **Azure CLI** (both required): these need an OS installer (winget, Homebrew, apt). Give the user the exact command for their OS from [FABRIC-CLI.md](./FABRIC-CLI.md#nodejs-and-azure-cli); run it only if they ask you to. Confirm with `node --version` and `az --version` before moving on; an installer usually needs a new terminal before the command is on PATH.
+- Warm the Fabric MCP package so the first session doesn't time out on download: `npx -y @microsoft/fabric-mcp@latest --help`.
 - Claude Code plugin for Microsoft's remote MCPs (if chosen in Section C): `claude plugin marketplace add microsoft/skills-for-fabric` then `claude plugin install fabric-skills@fabric-collection`.
 
 If an install fails, stop and show the error. Don't try alternative installers silently.
@@ -131,9 +140,11 @@ If an install fails, stop and show the error. Don't try alternative installers s
 You cannot complete an interactive sign-in for the user, and you must never see their password or secret. Tell them exactly what to run, **in their own terminal**, then wait for them to say they're done:
 
 ```
-fab auth login          # choose the identity agreed in Section D
-az login                # only if remote Fabric MCPs or the local Fabric MCP were chosen
+fab auth login          # the Fabric CLI; choose the identity agreed in Section D
+az login                # the Fabric MCP; sign in as the same identity, same tenant
 ```
+
+Both are required: `fab` and Fabric MCP keep separate sign-ins. When the tenant has no Azure subscription, use `az login --tenant <tenant-id> --allow-no-subscriptions`. For a service principal, the user runs `az login --service-principal --help` and signs in with the same principal as `fab`.
 
 Claude Code users can also type `! fab auth login` in the prompt, but a separate terminal is more reliable for the interactive menu and the browser pop-up. If the agent runs in WSL or a container, the sign-in must happen **there**, not on the Windows host. See [FABRIC-CLI.md](./FABRIC-CLI.md#sign-in).
 

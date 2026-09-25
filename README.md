@@ -16,7 +16,7 @@ The fix is the same one you'd use for a new consultant: an onboarding package. A
 | --- | --- | --- |
 | **Instruction file** | `AGENTS.md` (+ one-line pointers: `CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md`) | How the agent behaves: guardrails, standing rules, where the knowledge is |
 | **Reference files** | `reference/environment.md`, `naming-conventions.md`, `fabric-cli.md`, `architecture/*.md` | What you know: your tenant, conventions, patterns |
-| **Connections** | `.mcp.json` (Microsoft Learn MCP, Fabric MCP), Fabric CLI `fab` | Live information: current docs, and the ability to build and run things in Fabric |
+| **Connections** | Fabric CLI `fab`, and in `.mcp.json` the required **Microsoft Learn MCP** and **Fabric MCP** | Live information: current docs, real item schemas, OneLake, and the ability to build and run things in Fabric |
 | **Workflows** | skills like the ones in this repo | The things you repeat all the time |
 
 ## Quick start
@@ -56,9 +56,9 @@ Run it once in the repo you want to turn into a Fabric brain. It will:
    - which identity `fab` should sign in as
 3. **Show you a draft** of everything it will write, and let you edit it
 4. **Write** `AGENTS.md`, the pointer files, `reference/`, `data/`, and merge MCP servers and permission rules into your existing config
-5. **Install** the Fabric CLI and the chosen MCP servers
-6. **Hand sign-in to you**: you run `fab auth login` (and `az login` if needed) in your own terminal. The agent never sees your password or secret
-7. **Verify**, read-only: signed in, right tenant, workspaces visible, MCP servers actually answering. You get a pass/fail table with a fix for each failure
+5. **Install** Node.js, the Azure CLI and the Fabric CLI if missing, and connect the two required MCP servers: **Microsoft Learn MCP** (current docs) and **Fabric MCP** (item schemas, API specs, OneLake; read-only by default so every change goes through `fab`). Other Fabric MCPs are optional
+6. **Hand sign-in to you**: you run `fab auth login` and `az login` in your own terminal. The agent never sees your password or secret
+7. **Verify**, read-only: signed in, same tenant for `fab` and `az`, workspaces visible, both MCP servers actually answering. You get a pass/fail table with a fix for each failure
 
 New MCP servers load only in a new session, so restart your agent and run:
 
@@ -82,7 +82,7 @@ your-repo/
 ├── CLAUDE.md                         ← pointer: @AGENTS.md
 ├── .github/copilot-instructions.md   ← pointer (if you use Copilot)
 ├── GEMINI.md                         ← pointer (if you use Gemini CLI)
-├── .mcp.json                         ← Microsoft Learn MCP (+ Fabric MCP if chosen)
+├── .mcp.json                         ← Microsoft Learn MCP + Fabric MCP (required)
 ├── .claude/settings.json             ← fab read commands allowed, write commands always ask
 ├── reference/
 │   ├── environment.md                ← tenant, workspaces, what's in scope

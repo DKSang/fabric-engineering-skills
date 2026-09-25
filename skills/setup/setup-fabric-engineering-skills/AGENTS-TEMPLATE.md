@@ -53,7 +53,7 @@ When the user explains something durable (a convention, an environment fact, a g
 
 - **Fabric CLI** (`fab`): create, inspect and run items. Notes in `reference/fabric-cli.md`.
 - **Microsoft Learn MCP** (`microsoft-learn`): current Microsoft documentation.
-{- **Fabric MCP** (`fabric-mcp`): Fabric API specs, item definition schemas, best practices, OneLake.}
+- **Fabric MCP** (`fabric-mcp`): Fabric API specs, item definition schemas and best practices; read OneLake files, tables and workspaces. {Read-only: make changes with `fab`.} Before writing or changing an item definition, check it against `docs_item-definitions`.
 {- other MCP servers chosen in setup, one line each}
 <!-- fabric-engineering-skills:end -->
 ```
@@ -63,4 +63,4 @@ When the user explains something durable (a convention, an environment fact, a g
 - **Exact names.** Workspace names go in exactly as Fabric shows them. A near-miss makes the scope rule useless.
 - **One writable workspace is the norm.** If the user lists more than two, ask once whether they're sure.
 - **No knowledge in `AGENTS.md`.** If you're tempted to paste a naming rule or an architecture description here, it belongs in `reference/` with a pointer from the index.
-- **Drop, don't placeholder.** If a line doesn't apply (no Git-connected items, no Fabric MCP), delete it. Never leave `{...}` in the written file.
+- **Drop, don't placeholder.** If a line doesn't apply (no Git-connected items, Fabric MCP not read-only), delete it. Never leave `{...}` in the written file.
