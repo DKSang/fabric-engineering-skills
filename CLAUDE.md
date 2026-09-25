@@ -6,7 +6,7 @@ Skills live in bucket folders under `skills/`:
 
 - `setup/`: run-once scaffolding and connection setup
 - `brain/`: capturing and maintaining context in `reference/`
-- `build/`: daily Fabric work on top of the brain (planned)
+- `build/`: daily Fabric work on top of the brain
 - `in-progress/`: public on purpose, feedback wanted, not shipped in the plugin
 
 Each skill is a folder with a `SKILL.md`, an `agents/openai.yaml` (Codex UI metadata), and any reference files it owns, linked from `SKILL.md` by relative path. A skill never links into another skill's folder; to reuse another skill, it tells the agent to call the Skill tool with that skill's name.

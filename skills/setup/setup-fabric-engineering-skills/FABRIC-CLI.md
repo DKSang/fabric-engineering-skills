@@ -63,7 +63,9 @@ Sign in (user runs it): `az login`, or `az login --tenant <tenant-id> --allow-no
 
 ## Permission rules
 
-Claude Code only: merge into `.claude/settings.json`. Read-only `fab` commands run without a prompt; anything that can change Fabric always asks, even in auto-accept modes. The `fab api` and `fab job` families stay on "ask" because the same command can read or write depending on its flags.
+Claude Code only: merge into `.claude/settings.json`. Read-only `fab` commands run without a prompt; anything that can change Fabric always asks, even in auto-accept modes. `fab api` stays on "ask" because the same command can read or write depending on its flags.
+
+Claude Code checks `ask` rules before `allow` rules, so a broad ask rule silently overrides a narrower allow rule. That's why the `fab job` and `fab table` rules name each write subcommand instead of `fab job:*`: a trailing ` *` needs a space, so `Bash(fab job run *)` matches `fab job run ...` but not `fab job run-status ...`, which stays prompt-free for polling.
 
 ```json
 {
@@ -80,6 +82,7 @@ Claude Code only: merge into `.claude/settings.json`. Read-only `fab` commands r
       "Bash(fab config ls)",
       "Bash(fab job run-status:*)",
       "Bash(fab job run-list:*)",
+      "Bash(fab table schema:*)",
       "Bash(npx -y @microsoft/fabric-mcp@latest docs:*)",
       "Bash(npx -y @microsoft/fabric-mcp@latest onelake list-workspaces:*)",
       "Bash(az --version)",
@@ -101,8 +104,15 @@ Claude Code only: merge into `.claude/settings.json`. Read-only `fab` commands r
       "Bash(fab stop:*)",
       "Bash(fab acl:*)",
       "Bash(fab label:*)",
-      "Bash(fab table:*)",
-      "Bash(fab job:*)",
+      "Bash(fab table load:*)",
+      "Bash(fab table optimize:*)",
+      "Bash(fab table vacuum:*)",
+      "Bash(fab job run *)",
+      "Bash(fab job start *)",
+      "Bash(fab job run-cancel *)",
+      "Bash(fab job run-update *)",
+      "Bash(fab job run-rm *)",
+      "Bash(fab job run-sch *)",
       "Bash(fab api:*)",
       "Bash(fab auth login:*)",
       "Bash(fab auth logout:*)",
@@ -141,11 +151,17 @@ Write this in step 4, then fill the version and sign-in method after [VERIFY.md]
 | Properties (IDs etc.) | `fab get "<ws>.Workspace/<item>.<Type>" -q id` |
 | What can I do with this? | `fab desc .<Type>` |
 | Export a definition to local files | `fab export "<ws>.Workspace/<item>.<Type>" -o ./<folder>` |
-| Run and wait | `fab job run "<ws>.Workspace/<item>.<Type>"` |
-| Check a run | `fab job run-status "<ws>.Workspace/<item>.<Type>" --id <job-id>` |
+| Create a lakehouse with schemas | `fab mkdir "<ws>.Workspace/<lh>.Lakehouse" -P enableSchemas=true` |
+| Upload a local file | `fab cp ./data/<file> "<ws>.Workspace/<lh>.Lakehouse/Files/<path>/<file>"` |
+| Import a definition folder | `fab import "<ws>.Workspace/<item>.<Type>" -i <folder> -f` (notebooks in `.py` format: add `--format .py`) |
+| Start a job, then poll | `fab job start "<path>"`, `fab job run-list "<path>"`, `fab job run-status "<path>" --id <job-id>` |
 | Raw REST call | `fab api -X get workspaces` |
 
 ## Gotchas
+
+- `fab import` always asks "Are you sure?", which the agent's shell can't answer: it needs `-f`, used only for an approved import.
+- `fab job run --timeout N` cancels the job when the timeout hits (config `job_cancel_ontimeout`, default true). For long jobs use `fab job start` and poll.
+- Notebook import defaults to `.ipynb`; a `notebook-content.py` folder needs `--format .py`.
 
 (Add here whenever `fab` surprises us: the error, the cause, the fix.)
 ```

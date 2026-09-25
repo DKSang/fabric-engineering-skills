@@ -118,14 +118,18 @@ The agent acts as whoever signs in to `fab`. Written guardrails keep it honest, 
 
 User-invoked skills fire only when you type them; model-invoked skills are also picked up by the agent on its own when the task fits.
 
+### Build
+
+**Model-invoked**
+
+- **[build-in-fabric](./skills/build/build-in-fabric/SKILL.md)**: Turn "set up my bronze layer for the orders data in dev" into working items: load your conventions, research current formats on Fabric MCP and Microsoft Learn, present a dry-run plan for your yes, build only in the writable workspace (directly with `fab`, or as definitions in your Git-connected repo), verify, then run an end-to-end test that checks the data and fixes failures.
+
 ### Roadmap
 
 Planned next, building on the brain the setup creates:
 
 | Skill | Job |
 | --- | --- |
-| `verify-fabric-claims` | Check Fabric feature claims against Microsoft Learn before stating them |
-| `build-in-fabric` | Plan from `reference/`, dry run, build in the allowed workspace, verify, end-to-end test, fix, re-run |
 | `fabric-item-definitions` | Read and safely modify Git-connected item definitions (notebooks, pipelines, lakehouses) |
 | `document-fabric-workspace` | Inventory a workspace into `reference/workspaces/<name>.md` |
 | `fabric-guardrails` | A hook that blocks `fab` writes outside the allowed workspaces |

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Build in Fabric"
+  short_description: "Plan, build, verify and end-to-end test Fabric items"

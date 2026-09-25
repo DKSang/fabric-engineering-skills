@@ -18,7 +18,7 @@ Before any Fabric work, read the `reference/` files relevant to the task (index 
 
 - **Scope.** You may create or modify items only in: {writable workspaces, exact names}. Every other workspace is read-only. {PRD workspaces} are never modified, even if asked casually; ask for explicit confirmation naming the workspace.
 - **Dry run first.** Before any write, show the exact commands or definition changes you will run, and what they will create, change or delete.
-- **Confirm destructive operations.** Never delete, overwrite, move or re-permission an item without an explicit yes for that specific operation. Never use `--force` / `-f` to skip a prompt.
+- **Confirm destructive operations.** Never delete, overwrite, move or re-permission an item without an explicit yes for that specific operation. `fab` asks its own confirmation that your shell can't answer, so some commands (e.g. `fab import`) need `-f`: use it only for the exact operation the user just approved. Never `fab rm --hard`.
 - **Secrets.** Never print, log or write tokens, passwords, client secrets or connection strings. Don't run commands that print access tokens.
 - **Identity.** `fab` runs as {identity: e.g. "service principal sp-fabric-dev" or "the developer's own account"}. Treat everything that identity can see as sensitive.
 
@@ -27,6 +27,8 @@ Before any Fabric work, read the `reference/` files relevant to the task (index 
 Fabric changes monthly and your training data has a cutoff. Before stating that Fabric supports (or doesn't support) a feature, setting, API or limit, verify it against Microsoft Learn using the `microsoft-learn` MCP server and cite the page. If you can't verify it, say so.
 
 ## Build, verify, test
+
+If the `build-in-fabric` skill is available, use it for any build. Otherwise:
 
 1. Plan from `reference/` (naming, architecture) and confirm the plan.
 2. Build in the writable workspace only, following the guardrails.
