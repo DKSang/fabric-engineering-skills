@@ -101,6 +101,7 @@ The agent acts as whoever signs in to `fab`. Written guardrails keep it honest, 
 - Prefer a **service principal** with access to only your dev workspace. If you use your own account and you're a Fabric admin, the agent can see everything you can; use a playground tenant.
 - Read-only `fab` commands run freely; anything that can change Fabric asks you first.
 - The safest workflow of all: let the agent edit item definitions in a Git-connected repo, and sync them to Fabric yourself.
+- Git restores **definitions** (notebooks, pipelines, item settings), not **data**: files in a lakehouse, Delta tables, and items deleted with `--hard` don't come back from Git. That's why every destructive command needs its own yes.
 
 ## Skills
 
@@ -128,15 +129,6 @@ User-invoked skills fire only when you type them; model-invoked skills are also 
 **Model-invoked**
 
 - **[build-in-fabric](./skills/build/build-in-fabric/SKILL.md)**: Turn "set up my bronze layer for the orders data in dev" into working items: load your conventions, research current formats on Fabric MCP and Microsoft Learn, present a dry-run plan for your yes, build only in the writable workspace (directly with `fab`, or as definitions in your Git-connected repo), verify, then run an end-to-end test that checks the data and fixes failures.
-
-### Roadmap
-
-Planned next, building on the brain the setup creates:
-
-| Skill | Job |
-| --- | --- |
-| `fabric-item-definitions` | Read and safely modify Git-connected item definitions (notebooks, pipelines, lakehouses) |
-| `fabric-guardrails` | A hook that blocks `fab` writes outside the allowed workspaces |
 
 ## Related
 

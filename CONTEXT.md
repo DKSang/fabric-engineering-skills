@@ -29,10 +29,10 @@ _Avoid_: save, remember (as verbs for this)
 
 **Scope**:
 The set of workspaces the agent may modify. Everything outside it is read-only.
-_Avoid_: allowlist (fine for the hook implementation only)
+_Avoid_: allowlist
 
 **Guardrails**:
-The written rules in `AGENTS.md` (scope, dry run, confirm destructive operations, no secrets) plus any enforcement (permission rules, hooks).
+The written rules in `AGENTS.md` (scope, dry run, confirm destructive operations, no secrets) plus their enforcement: the `fab` permission rules in `.claude/settings.json` and the plan gate in `build-in-fabric`.
 
 **Standing rule**:
 A rule in `AGENTS.md` that applies to every task, e.g. "verify Fabric claims against Microsoft Learn before stating them".
