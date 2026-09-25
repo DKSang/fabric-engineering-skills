@@ -1,4 +1,4 @@
-# Fabric Engineering Skills
+# <img src="docs/assets/fabric-icon.png" width="32" height="32" align="top" alt="" /> Fabric Engineering Skills
 
 [![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FDKSang%2Ffabric-engineering-skills%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=teal)](./CHANGELOG.md)
 [![License](https://img.shields.io/github/license/DKSang/fabric-engineering-skills)](./LICENSE)
@@ -375,3 +375,5 @@ Every `fab` command written in a skill must match the current CLI (`fab <command
 ## License
 
 MIT. See [LICENSE](./LICENSE). Release notes: [CHANGELOG.md](./CHANGELOG.md).
+
+Microsoft Fabric and the Fabric icon are trademarks of Microsoft. This is a community project, not affiliated with or endorsed by Microsoft.

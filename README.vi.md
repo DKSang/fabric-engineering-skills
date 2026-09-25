@@ -1,4 +1,4 @@
-# Fabric Engineering Skills
+# <img src="docs/assets/fabric-icon.png" width="32" height="32" align="top" alt="" /> Fabric Engineering Skills
 
 [![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FDKSang%2Ffabric-engineering-skills%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=teal)](./CHANGELOG.md)
 [![License](https://img.shields.io/github/license/DKSang/fabric-engineering-skills)](./LICENSE)
@@ -375,3 +375,5 @@ Mọi lệnh `fab` viết trong skill phải khớp CLI hiện tại (`fab <comm
 ## License
 
 MIT. Xem [LICENSE](./LICENSE). Ghi chú phát hành: [CHANGELOG.md](./CHANGELOG.md).
+
+Microsoft Fabric và icon Fabric là nhãn hiệu của Microsoft. Đây là dự án cộng đồng, không liên kết hay được Microsoft bảo trợ.
