@@ -9,6 +9,8 @@ The connections that give the agent live information. Two are **required** on ev
 | Microsoft remote Fabric MCPs | optional | FabricIQ (discovery, DAX), Power BI modeling, SQL endpoint queries | Azure CLI sign-in | Azure CLI |
 | `fabric-rti-mcp` | optional | Eventhouse / KQL queries, Eventstreams | Azure sign-in | `uv` (Python) |
 
+Only write config for the tools picked in Section A. File locations per tool are in [AGENT-TOOLS.md](./AGENT-TOOLS.md).
+
 ## Microsoft Learn MCP (required)
 
 Endpoint: `https://learn.microsoft.com/api/mcp` (streamable HTTP, no auth). Tools: `microsoft_docs_search`, `microsoft_docs_fetch`, `microsoft_code_sample_search`.
@@ -61,6 +63,18 @@ url = "https://learn.microsoft.com/api/mcp"
 ```
 
 (Equivalent CLI: `codex mcp add microsoft-learn --url https://learn.microsoft.com/api/mcp`.)
+
+**DeepSeek Harness (`dsh`)**: one `@deepseek-ai/dsh-mcp-client` row per server in the overlay `.dsh/fabric-engineering.cordis.yml` (the Fabric MCP row below goes in the same `insert` list; see [DeepSeek Harness](#deepseek-harness-dsh) for the complete file):
+
+```yaml
+- insert:
+    - id: fabric-engineering-microsoft-learn
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: microsoft-learn
+        transport: streamable-http
+        url: https://learn.microsoft.com/api/mcp
+```
 
 **Gemini CLI**: `.gemini/settings.json`:
 
@@ -128,6 +142,8 @@ env = { AZURE_TOKEN_CREDENTIALS = "AzureCliCredential" }
 
 **Gemini CLI** (`.gemini/settings.json`): same `command`, `args` and `env` under `"mcpServers"`.
 
+**DeepSeek Harness (`dsh`)**: a stdio row in the same overlay; see below.
+
 On Windows, if the tool can't spawn `npx` directly, use `"command": "cmd"` with `"args": ["/c", "npx", "-y", ...]`.
 
 ### Also a command line
@@ -138,6 +154,36 @@ The same package runs one-off commands in a terminal, which is how [VERIFY.md](.
 npx -y @microsoft/fabric-mcp@latest docs list-item-types
 npx -y @microsoft/fabric-mcp@latest onelake list-workspaces
 ```
+
+## DeepSeek Harness (`dsh`)
+
+dsh reads MCP servers from Cordis patch rows, not from a JSON file. Write this overlay to `.dsh/fabric-engineering.cordis.yml` (merge rows into it if it exists):
+
+```yaml
+# Fabric Engineering Skills: MCP servers for DeepSeek Harness.
+# Load with: dsh web --patch "$PWD/.dsh/fabric-engineering.cordis.yml"
+- insert:
+    - id: fabric-engineering-microsoft-learn
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: microsoft-learn
+        transport: streamable-http
+        url: https://learn.microsoft.com/api/mcp
+    - id: fabric-engineering-fabric-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: fabric-mcp
+        transport: stdio
+        command: npx
+        args: ['-y', '@microsoft/fabric-mcp@latest', 'server', 'start', '--mode', 'all', '--read-only']
+        env:
+          AZURE_TOKEN_CREDENTIALS: AzureCliCredential
+```
+
+- `serverName` must match `[A-Za-z0-9_-]{1,32}` and be unique; tools appear as `mcp__<serverName>__<tool>` (e.g. `mcp__fabric-mcp__docs_list-item-types`).
+- On Windows use `command: npx.cmd`: dsh starts stdio servers without a shell.
+- Loading: per launch with `--patch` (recommended; nothing outside the repo changes), or merged into `~/.dsh/cordis.patch.yml` so every launch has it. Ask before touching the home file, and merge its `insert` rows rather than overwriting it.
+- dsh validates rows at boot: a malformed row stops dsh with `invalid config` and names the row's `id`, so a wrong field shows up immediately.
 
 ## Microsoft remote Fabric MCPs
 

@@ -45,7 +45,7 @@ If the current session started before the MCP config was written, mark these **p
 
 | # | Check | How | Pass when |
 | --- | --- | --- | --- |
-| M1 | Server registered and connected | Claude Code: `claude mcp list` (and ask the user to glance at `/mcp`). Codex: `/mcp`. VS Code: **MCP: List Servers**. | each chosen server shows connected / running |
+| M1 | Server registered and connected, for each tool picked in Section A | Claude Code: `claude mcp list` (and ask the user to glance at `/mcp`). Codex: `/mcp`. VS Code: **MCP: List Servers**. dsh: launched with the overlay (or the home patch), its tool list shows `mcp__microsoft-learn__...` and `mcp__fabric-mcp__...` tools | each chosen server shows connected / running |
 | M2 | Microsoft Learn answers | call `microsoft_docs_search` with `"Microsoft Fabric lakehouse schemas"` | returns results with `learn.microsoft.com` URLs |
 | M3 | Fabric MCP answers (required) | call `docs_list-item-types` | returns item types including `lakehouse` and `notebook` |
 | M4 | Fabric MCP reaches the tenant (required) | call `onelake_list-workspaces` | lists the writable workspaces from Section B, no auth error |
@@ -97,6 +97,8 @@ AZURE_TOKEN_CREDENTIALS=AzureCliCredential npx -y @microsoft/fabric-mcp@latest o
 | M4 fails with a credential error | `az login` missing where the agent runs, or signed in to another tenant | Fix A2 and A3; the MCP reads the Azure CLI sign-in only (pinned by `AZURE_TOKEN_CREDENTIALS`) |
 | M4 works but a writable workspace is missing | The Azure CLI identity differs from the `fab` identity | Sign `az` in as the same user or principal as `fab` |
 | First Fabric MCP start times out | `npx` downloading the package during the first session | Run `npx -y @microsoft/fabric-mcp@latest --help` once, then restart |
+| dsh stops at boot with `invalid config` | A malformed row in `.dsh/fabric-engineering.cordis.yml` | Fix the field the error names (it quotes the row `id` and the expected shape) |
+| dsh shows no `mcp__` tools | Launched without `--patch` and the rows aren't in `~/.dsh/cordis.patch.yml` | Relaunch with `--patch "$PWD/.dsh/fabric-engineering.cordis.yml"` |
 | MCP server not listed | Session started before the config was written, or config in the wrong file for this tool | Restart the tool; check the path against MCP-SERVERS.md |
 | Claude Code shows the project server as disabled | Project-scoped servers need approval | User approves it in `/mcp` |
 | `npx` server fails to start on Windows | Tool can't spawn `npx` directly | Use `"command": "cmd"`, `"args": ["/c", "npx", ...]` |

@@ -2,6 +2,11 @@
 
 Every release bumps `version` in `.claude-plugin/plugin.json` and adds a section here; that version change is what lets Claude Code offer the update to installed users.
 
+## 0.2.0
+
+- `setup-fabric-engineering-skills` asks which AI tools to configure and defaults to only the one running the setup. Pointers, MCP config, permission rules and verification are done for the picked tools only; a tool's folder existing no longer selects it. The per-tool details live in the new `AGENT-TOOLS.md`.
+- DeepSeek Harness (`dsh`) support: reads `AGENTS.md` natively, discovers the skills in `.agents/skills/` (`npx skills add ... --agent universal`), and gets Microsoft Learn MCP and Fabric MCP through a `.dsh/fabric-engineering.cordis.yml` overlay loaded with `--patch` or merged into `~/.dsh/cordis.patch.yml`.
+
 ## 0.1.0
 
 First release.

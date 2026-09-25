@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/DKSang/fabric-engineering-skills)](./LICENSE)
 [![Checks](https://img.shields.io/github/actions/workflow/status/DKSang/fabric-engineering-skills/check.yml?branch=main&label=checks)](https://github.com/DKSang/fabric-engineering-skills/actions/workflows/check.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude_Code-plugin-D97757)](#install)
-[![Agent Skills](https://img.shields.io/badge/Agent_Skills-Codex%20%7C%20Copilot%20%7C%20Cursor-4B32C3)](#install)
+[![Agent Skills](https://img.shields.io/badge/Agent_Skills-dsh%20%7C%20Codex%20%7C%20Copilot%20%7C%20Cursor-4B32C3)](#install)
 
 > **Preview.** Five skills, checked against Fabric CLI 1.7 and Fabric MCP 1.4, and tested with headless Claude Code runs against a simulated `fab`. Not yet run end to end against a live tenant. [See what's tested.](#feature-stability)
 
@@ -20,7 +20,7 @@ Turn any repo into a **Fabric brain**: an `AGENTS.md` and a `reference/` folder 
 > Set up my metadata-driven bronze layer for the orders data in my dev workspace
 ```
 
-Works with Claude Code, GitHub Copilot, Codex, Cursor and Gemini CLI. The knowledge lives in plain files, not inside any one tool, so it comes with you when you switch.
+Works with Claude Code, DeepSeek Harness (`dsh`), Codex, GitHub Copilot, Cursor and Gemini CLI. The knowledge lives in plain files, not inside any one tool, so it comes with you when you switch.
 
 ## The Problem
 
@@ -48,7 +48,7 @@ claude plugin marketplace add DKSang/fabric-engineering-skills
 claude plugin install fabric-engineering-skills@fabric-engineering
 ```
 
-**Codex, GitHub Copilot, Cursor and other agents**: copies the skill folders into your project as files you own.
+**DeepSeek Harness (`dsh`), Codex, GitHub Copilot, Cursor and other agents**: copies the skill folders into your project as files you own.
 
 ```bash
 npx skills@latest add DKSang/fabric-engineering-skills
@@ -64,7 +64,7 @@ In the repo you want to turn into a Fabric brain:
 /setup-fabric-engineering-skills
 ```
 
-It explores the repo and your machine, asks a few questions one at a time (AI tools, which workspace the agent may modify, sign-in identity, your conventions), shows you a draft of every file, then writes, installs the Fabric CLI and MCP servers, and **hands sign-in to you**: you run `fab auth login` and `az login` in your own terminal, so the agent never sees a secret. Restart the agent, then:
+It explores the repo and your machine, asks a few questions one at a time (which AI tools to configure, defaulting to only the one you're running; which workspace the agent may modify; sign-in identity; your conventions), shows you a draft of every file, then writes, installs the Fabric CLI and MCP servers, and **hands sign-in to you**: you run `fab auth login` and `az login` in your own terminal, so the agent never sees a secret. Restart the agent, then:
 
 ```
 /setup-fabric-engineering-skills verify
@@ -138,7 +138,7 @@ A Fabric brain has four pieces:
 
 | Piece | Files | Job |
 | --- | --- | --- |
-| **Instruction file** | `AGENTS.md` + one-line pointers (`CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md`, `.cursor/rules/agents.mdc`) | How the agent behaves: scope, guardrails, standing rules, where the knowledge is |
+| **Instruction file** | `AGENTS.md` (read natively by dsh and Codex) + one-line pointers for the tools that need one (`CLAUDE.md`, `.github/copilot-instructions.md`, `GEMINI.md`, `.cursor/rules/agents.mdc`) | How the agent behaves: scope, guardrails, standing rules, where the knowledge is |
 | **Reference files** | `reference/`: environment, naming conventions, architecture patterns, lessons, glossary, decisions, workspace inventories | What you know |
 | **Connections** | Fabric CLI `fab`; Microsoft Learn MCP and Fabric MCP (required), more optional | Live information and the ability to build and run things |
 | **Workflows** | the skills in this repo | What you repeat all the time |
@@ -175,7 +175,7 @@ flowchart LR
 
 | Stage | Skill | What happens |
 | --- | --- | --- |
-| Once per repo | `/setup-fabric-engineering-skills` | Writes `AGENTS.md`, pointers and `reference/` seeds; installs the Fabric CLI and MCP servers; you sign in; read-only verification |
+| Once per repo | `/setup-fabric-engineering-skills` | You pick which AI tools to configure; it writes `AGENTS.md`, their pointers and MCP config, and `reference/` seeds; installs the Fabric CLI and MCP servers; you sign in; read-only verification |
 | After a restart, any time | `/setup-fabric-engineering-skills verify` | Re-checks sign-in, tenant, workspaces and every MCP server |
 | Every task | `fabric-brain` (automatic) | Reads the relevant `reference/` files first; flags requests that contradict them; captures what you explain or correct |
 | Building | `build-in-fabric` (automatic) | Plan → dry run → your yes → build in the writable workspace → verify → end-to-end test → fix and re-run |
@@ -199,11 +199,12 @@ Skills "invoked by you" run only when you type them. Skills the agent invokes ar
 ```
 your-repo/
 ├── AGENTS.md                         ← canonical instructions (scope, guardrails, standing rules, index)
-├── CLAUDE.md                         ← pointer: @AGENTS.md
-├── .github/copilot-instructions.md   ← pointer (if you use Copilot)
-├── GEMINI.md                         ← pointer (if you use Gemini CLI)
-├── .mcp.json                         ← Microsoft Learn MCP + Fabric MCP
-├── .claude/settings.json             ← fab read commands allowed, write commands always ask
+├── CLAUDE.md                         ← pointer: @AGENTS.md (if you picked Claude Code)
+├── .github/copilot-instructions.md   ← pointer (if you picked Copilot)
+├── GEMINI.md                         ← pointer (if you picked Gemini CLI)
+├── .mcp.json                         ← Microsoft Learn MCP + Fabric MCP (Claude Code)
+├── .dsh/fabric-engineering.cordis.yml ← the same two servers for dsh (if you picked dsh)
+├── .claude/settings.json             ← fab read commands allowed, write commands always ask (Claude Code)
 ├── reference/
 │   ├── environment.md                ← tenant, workspaces, what's in scope
 │   ├── naming-conventions.md
@@ -214,7 +215,7 @@ your-repo/
 └── data/                             ← sample files for development
 ```
 
-It merges into files you already have and never overwrites your content: everything it owns sits between `<!-- fabric-engineering-skills:start -->` and `<!-- fabric-engineering-skills:end -->` markers. Changes to `reference/` are left uncommitted so you review them in the diff like any other change.
+Only the tools you pick get their files; `AGENTS.md` and `reference/` are always written. It merges into files you already have and never overwrites your content: everything it owns sits between `<!-- fabric-engineering-skills:start -->` and `<!-- fabric-engineering-skills:end -->` markers. Changes to `reference/` are left uncommitted so you review them in the diff like any other change.
 
 ## Connections
 
@@ -270,7 +271,7 @@ Skills are namespaced by the plugin: `/setup-fabric-engineering-skills` works, a
 </details>
 
 <details>
-<summary><strong>Codex, GitHub Copilot, Cursor and other agents: <code>npx skills</code></strong></summary>
+<summary><strong>DeepSeek Harness, Codex, GitHub Copilot, Cursor and other agents: <code>npx skills</code></strong></summary>
 
 ```bash
 npx skills@latest add DKSang/fabric-engineering-skills
@@ -283,6 +284,8 @@ npx skills@latest add DKSang/fabric-engineering-skills --skill '*' --agent codex
 ```
 
 Add `-g` to install for your user instead of this project.
+
+For **DeepSeek Harness (`dsh`)**, use `--agent universal`: it installs into `.agents/skills/`, which dsh discovers. The setup then writes dsh's MCP servers to `.dsh/fabric-engineering.cordis.yml`; launch with `dsh web --patch "$PWD/.dsh/fabric-engineering.cordis.yml"` (or let the setup merge it into `~/.dsh/cordis.patch.yml`).
 
 </details>
 
@@ -358,6 +361,8 @@ Every `fab` command written in a skill must match the current CLI (`fab <command
 | --- | --- | --- |
 | Plugin and `npx skills` install | **Tested** | Both routes installed from GitHub; bare and namespaced slash commands resolve |
 | Setup: files, pointers, MCP config, permission rules | **Tested** | Formats and JSON validated; merge behaviour covered in the skill |
+| Setup: choose which AI tools to configure | **Tested** | Defaults to the tool running the setup; others only when picked |
+| DeepSeek Harness (`dsh`) | **Checked** | The MCP overlay boots in dsh 2026-09 (rows validate, Fabric MCP starts); `AGENTS.md` loading, skills folders and `/skill` invocation confirmed in dsh's source; not yet run with a model |
 | Setup: `fab` and Fabric MCP commands | **Checked** | Against Fabric CLI 1.7 help/source and Fabric MCP 1.4 (`--read-only` tool list verified) |
 | `fabric-brain` capture and conflict detection | **Tested** | Headless Claude Code runs |
 | `build-in-fabric` gates (scope, sign-in, undocumented pattern, dry-run plan) | **Tested** | Headless runs with a simulated `fab`; no writes issued |
